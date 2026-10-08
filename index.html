@@ -477,9 +477,17 @@ function welcome(m, b) {
 }
 function pickLang(l) { D.set.lang = l; save(); render(); }
 function pickName(n) { D.set.name = n; installExamples(); save(); render(); }
-function installExamples() {
-  if (D.ex || !EXAMPLES) return; D.ex = true;
-  for (const g of EXAMPLES) { if (nameTaken(g.name)) continue; const list = { id: uid(), name: g.name, c: Date.now(), m: [] }; D.lists.push(list); for (const w of g.words) addWord(list, w.es, withThe(w.es, w.en), w.ru); }
+function installExamples() { D.ex = true; }   // no example lists any more
+// One-time cleanup: take the old example lists away. Words that are also in another list stay.
+function cleanupExamples() {
+  if (D.exCleaned2) return; D.exCleaned2 = true;
+  const names = ['Greetings · Saludos', 'Animals · Animales', 'Food · Comida'];
+  for (const name of names) {
+    const list = D.lists.find(l => l.name === name);
+    if (!list) continue;
+    D.lists.splice(D.lists.indexOf(list), 1);
+    for (const m of list.m) { const still = D.lists.some(l => l.m.some(x => x.k === m.k)) || D.orphans.some(o => o.k === m.k); if (!still) delete D.words[m.k]; }
+  }
 }
 
 /* =================== MEMORIZE =================== */
@@ -847,7 +855,7 @@ Promise.all([fetch('examples.json').then(r => r.json()).catch(() => ({ lists: []
   EXAMPLES = ex.lists; CATALOG = v; BYINF = {}; for (const x of v) if (!BYINF[x.i] || x.l > 0) BYINF[x.i] = x;
   loadCloud(() => {
     if (!hadLocal && !D.lists.length && !D.t) { migrateOld(); }
-    if (D.set.lang && D.set.name) installExamples();
+    cleanupExamples();
     save(); render();
   });
 });
