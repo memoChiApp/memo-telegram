@@ -5,7 +5,7 @@
 <title>memo</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--deep:#8E5DB5;--pale:#EFE3F6;--plum:#3B2A47;--muted:#7A6A86;--lemon:#FDFDC9;--lemonB:#E3DF96;--wine:#7A2448;--khaki:#C4D3A0;--khakiT:#4F6128;--m:16px;
+:root{--deep:#8E5DB5;--pale:#EFE3F6;--plum:#3B2A47;--muted:#7A6A86;--lemon:#FDFDC9;--lemonB:#E3DF96;--wine:#7A2448;--khaki:#C4D3A0;--khakiT:#4F6128;--cameo:#EBBAC8;--m:16px;
 --band:#C69FD5;--on:#FDFDC9;--off:#6E4A8C;--bgA:#F3E9F8;--bgB:#FDFDC9;--bgC:#F7E1E8}
 body[data-tab=lists]{--band:#EEEBCB;--on:#8E5DB5;--off:#8A8255;--bgA:#FDFDC9;--bgB:#F3E9F8;--bgC:#FDFDC9}
 body[data-tab=verbs]{--band:#DFA6B7;--on:#4F6128;--off:#6E3A4E;--bgA:#F7E1E8;--bgB:#FDFDC9;--bgC:#F3E9F8}
@@ -15,9 +15,10 @@ html,body{margin:0;height:100%;font-family:-apple-system,"SF Pro Rounded",system
 body{background:radial-gradient(circle at 12% 8%,var(--bgA) 0,transparent 55%),radial-gradient(circle at 92% 92%,var(--bgC) 0,transparent 55%),var(--bgB);transition:background .3s}
 #app{height:100%;display:flex;flex-direction:column}
 main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) var(--m) 16px;-webkit-overflow-scrolling:touch}
-h1{font-size:36px;line-height:1.1;color:var(--deep);margin:10px 0 4px;letter-spacing:-.5px}
-.sub{color:var(--muted);margin:0 0 14px;font-size:16px}
-.card{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.55));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1.5px solid rgba(255,255,255,.95);border-radius:24px;padding:15px 18px;margin-bottom:11px;box-shadow:0 6px 22px rgba(142,93,181,.13),inset 0 1px 0 #fff}
+h1{font-size:34px;line-height:1.1;color:var(--deep);margin:8px 0 4px;letter-spacing:-.5px}
+.sub{color:var(--muted);margin:0 0 12px;font-size:16px}
+.card{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.55));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1.5px solid rgba(255,255,255,.95);border-radius:24px;padding:14px 18px;margin-bottom:10px;box-shadow:0 6px 22px rgba(142,93,181,.13),inset 0 1px 0 #fff}
+.card.sel{background:linear-gradient(145deg,rgba(253,253,201,.95),rgba(253,253,201,.7))}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
 .row b{font-size:18px}.row small{display:block;color:var(--muted);margin-top:3px;font-size:14px}
 .chev{color:var(--deep);font-size:24px}
@@ -25,124 +26,356 @@ h1{font-size:36px;line-height:1.1;color:var(--deep);margin:10px 0 4px;letter-spa
 .num{width:34px;height:34px;border-radius:50%;background:var(--pale);color:var(--deep);font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;margin-right:12px}
 .num.done{background:var(--khaki);color:var(--khakiT)}
 .btnbar{display:flex;gap:10px;padding:10px var(--m) 14px}
-button{font:inherit;border:0;border-radius:999px;padding:17px 20px;font-weight:700;font-size:18px;cursor:pointer;transition:transform .1s}
-button:active{transform:scale(.97)}
+button{font:inherit;border:0;border-radius:999px;padding:15px 14px;font-weight:700;font-size:16px;cursor:pointer;transition:transform .1s}
+button:active{transform:scale(.97)}button:disabled{opacity:.45}
 .primary{flex:1;background:linear-gradient(180deg,#9A6AC0,#8456AB);color:#fff;box-shadow:0 6px 16px rgba(142,93,181,.35)}
 .lemon{flex:1;background:var(--lemon);color:var(--plum);border:2px solid var(--lemonB);box-shadow:0 6px 16px rgba(227,223,150,.5)}
-.soft{background:#DCC4EA;color:#5A3A75;padding:17px 22px}
+.soft{background:#DCC4EA;color:#5A3A75}
 .good{flex:1;background:var(--khaki);color:var(--khakiT)}
-.bad{flex:1;background:#EBBAC8;color:var(--wine)}
+.bad{flex:1;background:var(--cameo);color:var(--wine)}
+.khaki{flex:1;background:#698039;color:#fff}
 nav{display:flex;justify-content:space-around;padding:8px 0 calc(env(safe-area-inset-bottom) + 8px);background:var(--band);transition:background .3s}
 nav button{background:none;padding:8px 22px;color:var(--off);box-shadow:none;border-radius:16px}
 nav button.on{color:var(--on)}
 nav svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 .hero{display:block;width:78%;max-width:300px;margin:6px auto 0;transform:rotate(-5deg);filter:drop-shadow(0 14px 18px rgba(142,93,181,.22))}
-.word{display:flex;justify-content:space-between;align-items:center}
+.homewrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding-bottom:20px}
+.homewrap h1{font-size:42px;margin:0}.homewrap .hero{width:84%;max-width:340px;margin:18px auto 8px;animation:bob 3.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(-3deg) translateY(-8px)}}
+.word{display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:8px}
 .word .es{font-size:19px;font-weight:600}.word small{color:var(--muted);display:block;margin-top:2px}
 .el{color:#4B7DB5}.la{color:#C9608A}
-.pill{min-width:36px;text-align:center;border-radius:12px;padding:5px 9px;font-weight:800;background:var(--pale);color:#6E4A8C}
-.pill.z{background:#EBBAC8;color:var(--wine)}.pill.hi{background:#C69FD5;color:#fff}
-input[type=search]{width:100%;border:0;border-radius:999px;padding:15px 20px;font-size:17px;background:rgba(255,255,255,.85);margin-bottom:12px;box-shadow:0 4px 14px rgba(142,93,181,.1)}
-.flash{position:relative;margin-top:60px;height:48vh;max-height:430px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:34px;background:linear-gradient(160deg,#fff,#FBF6FD);box-shadow:0 14px 34px rgba(142,93,181,.22);touch-action:pan-y;padding:0 16px}
-.flash .es{font-size:38px;font-weight:800;letter-spacing:-.5px}.flash .en{font-size:27px;color:var(--deep);margin-top:14px}
-.flash .hint{position:absolute;bottom:16px;left:0;right:0;color:var(--muted);font-size:14px}
+.pill{min-width:36px;text-align:center;border-radius:12px;padding:5px 9px;font-weight:800;background:var(--pale);color:#6E4A8C;flex:none}
+.pill.z{background:var(--cameo);color:var(--wine)}.pill.hi{background:#C69FD5;color:#fff}
+input[type=search]{width:100%;border:0;border-radius:999px;padding:14px 20px;font-size:17px;background:rgba(255,255,255,.85);margin-bottom:12px;box-shadow:0 4px 14px rgba(142,93,181,.1)}
+.flash{position:relative;margin-top:60px;min-height:300px;height:46vh;max-height:420px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:34px;background:linear-gradient(160deg,#fff,#FBF6FD);box-shadow:0 14px 34px rgba(142,93,181,.22);touch-action:pan-y;padding:0 16px;flex-direction:column}
+.flash .cap{position:absolute;top:50px;left:0;right:0;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:.3px}
+.flash .big{font-size:38px;font-weight:800;letter-spacing:-.5px;color:var(--deep)}.flash .big.dark{color:var(--plum)}
+.flash .en{font-size:27px;color:var(--plum);margin-top:6px}
+.flash hr{width:50%;border:0;border-top:2px solid #EFE3F6;margin:16px 0}
+.flash .hint{position:absolute;bottom:14px;left:0;right:0;color:var(--muted);font-size:13px}
 .peek{position:absolute;top:-62px;left:50%;width:150px;transform:translateX(-50%) rotate(-4deg)}
 .prog{color:var(--muted);text-align:right;margin:0;font-weight:700}
-.bar{height:8px;border-radius:8px;background:rgba(255,255,255,.7);overflow:hidden;margin:6px 0 0}.bar i{display:block;height:100%;background:var(--deep);border-radius:8px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.x{background:none;color:var(--deep);padding:4px 8px;font-size:22px}
+.bar{height:8px;border-radius:8px;background:rgba(255,255,255,.7);overflow:hidden;margin:6px 0 0}.bar i{display:block;height:100%;background:var(--deep);border-radius:8px;transition:width .3s}
+.bar.t i{background:var(--cameo);transition:width 1s linear}
 .back{color:var(--deep);font-size:18px;cursor:pointer;margin-bottom:4px;display:inline-block;font-weight:600}
 .center{text-align:center}
-.seg{display:flex;gap:8px;margin-bottom:14px}.seg button{flex:1;padding:14px;font-size:16px;background:#fff;color:var(--deep);border:2px solid #DCC4EA}.seg button.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+.seg{display:flex;gap:6px;margin-bottom:12px;background:rgba(255,255,255,.55);padding:4px;border-radius:999px}.seg button{flex:1;padding:11px 6px;font-size:15px;background:none;color:var(--deep)}.seg button.on{background:var(--deep);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.chips button{padding:10px 14px;font-size:15px;background:#fff;color:var(--deep);border:2px solid #DCC4EA}.chips button.on{background:var(--deep);color:#fff;border-color:var(--deep)}
 input.f{width:100%;border:2px solid #DCC4EA;border-radius:20px;padding:15px 18px;font-size:19px;margin-top:14px;background:#fff}
-.fb{font-weight:800;font-size:21px;margin-top:12px}.ok{color:var(--khakiT)}.no{color:var(--wine)}
+.fb{font-weight:800;font-size:20px;margin-top:10px}.ok{color:var(--khakiT)}.no{color:var(--wine)}.meh{color:#9A7B00}
 table{width:100%;border-collapse:collapse;font-size:17px}td{padding:6px 4px}td:first-child{color:var(--muted);font-size:14px;width:42%}
 td b.irr{color:#C9608A}
 .rule{white-space:pre-line;line-height:1.45}
-.stat{display:flex;gap:10px}.stat .card{flex:1;text-align:center;margin:0 0 11px}.stat b{font-size:30px;color:var(--deep);display:block}.stat span{color:var(--muted);font-size:13px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.tile{position:relative;overflow:hidden;border-radius:24px;padding:12px 14px;min-height:92px;background:rgba(255,255,255,.7);border:1.5px solid #fff;box-shadow:0 6px 22px rgba(142,93,181,.12)}
+.tile span{color:var(--muted);font-size:13px;font-weight:600}.tile b{display:block;font-size:24px;margin-top:2px}.tile img{position:absolute;right:-12px;bottom:-8px;width:76px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:96px;margin-top:8px}.chart div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--muted);gap:4px}.chart i{display:block;width:100%;border-radius:6px;background:var(--khaki);min-height:3px}.chart .cur i{background:#698039}
+.segbar{display:flex;height:10px;border-radius:10px;overflow:hidden;gap:2px;margin:8px 0}.segbar i{display:block;height:100%}
+.legend{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
 .tag{display:inline-block;background:var(--pale);color:#6E4A8C;border-radius:10px;padding:2px 9px;font-size:13px;font-weight:700;margin-left:8px}
-</style></head>
-<body data-tab="memorize"><div id="app"><main id="main"></main><div id="bar"></div><nav id="nav"></nav></div>
-<script>
-const tg = window.Telegram && Telegram.WebApp; if (tg) { tg.ready(); tg.expand(); }
-const $ = s => document.querySelector(s);
+.warn{color:#9A7B00;font-size:13px;font-weight:700}
+.switch{width:52px;height:30px;border-radius:30px;background:#DCC4EA;position:relative;flex:none;transition:.2s}.switch.on{background:var(--deep)}.switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}.switch.on::after{left:25px}
+.optbtn{display:block;width:100%;background:#fff;border:2px solid #DCC4EA;color:var(--plum);margin-bottom:10px;padding:18px}
+.optbtn.right{background:var(--khaki);border-color:#698039}.optbtn.wrong{background:var(--cameo);border-color:var(--wine)}
+.undo{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 150px);transform:translateX(-50%);background:var(--plum);color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;z-index:5;white-space:nowrap}
+#sheet{position:fixed;inset:0;background:rgba(59,42,71,.45);display:none;align-items:flex-end;justify-content:center;z-index:9}
+#sheet.on{display:flex}
+#sheet .box{width:100%;max-width:520px;max-height:90vh;overflow:auto;background:linear-gradient(160deg,#fff,#F8F0FB);border-radius:30px 30px 0 0;padding:20px var(--m) calc(env(safe-area-inset-bottom) + 18px)}
+#sheet h2{margin:0 0 6px;color:var(--deep);font-size:24px}
+#sheet textarea{width:100%;min-height:170px;border:2px solid #DCC4EA;border-radius:18px;padding:14px;font:inherit;font-size:16px;background:#fff;margin:8px 0;resize:vertical}
+#sheet input[type=text]{width:100%;border:2px solid #DCC4EA;border-radius:18px;padding:13px 16px;font:inherit;font-size:17px;background:#fff;margin-bottom:8px}
+#sheet select{width:100%;border:2px solid #DCC4EA;border-radius:18px;padding:13px 16px;font:inherit;font-size:17px;background:#fff;margin-bottom:8px}
+#sheet .acts{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}#sheet .acts button{padding:15px 12px;font-size:16px;flex:1}
+.hintx{color:var(--muted);font-size:14px;margin:2px 0 4px}.linkbtn{background:none;color:var(--wine);font-size:15px;padding:12px;display:block;margin:6px auto 0;font-weight:600}
+.pillrow{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}.pillrow button{padding:8px 14px;font-size:14px}
+.irow{display:flex;justify-content:space-between;align-items:center;gap:12px}
 
-/* ---------- storage: this phone + the person's Telegram cloud (split in pieces <4 KB) ---------- */
-const cloud = tg && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9') && tg.platform !== 'unknown' ? tg.CloudStorage : null;
-const CHUNK = 3500, KEYS = ['ratings','custom','lang','mode','vpass','stats'];
-const mem = {};
-const store = {
-  get(k, d) { try { const v = mem[k] ?? localStorage.getItem('memo.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) {
-    const j = JSON.stringify(v); mem[k] = j; try { localStorage.setItem('memo.' + k, j); } catch {}
-    if (!cloud) return;
-    try {
-      const n = Math.max(1, Math.ceil(j.length / CHUNK));
-      for (let i = 0; i < n; i++) cloud.setItem(`${k}_${i}`, j.slice(i * CHUNK, (i + 1) * CHUNK));
-      cloud.setItem(`${k}_n`, String(n));
-    } catch {}
-  }
-};
+/* ---- Telegram dark theme ---- */
+body.dark{--plum:#F3ECF8;--muted:#B9AAC7;--pale:#3B2E4C;--deep:#C9A6DE;--lemon:#4D4A22;--lemonB:#6B6730;--khakiT:#D3E3AE;--khaki:#4C5C2E;--cameo:#6A3447;--wine:#FFC4D6;--bgA:#2B2040;--bgB:#191321;--bgC:#2A1C2C;--band:#2A2040;--on:#FDFDC9;--off:#9C88B8}
+body.dark[data-tab=lists]{--band:#2A281C;--on:#C9A6DE;--off:#948D5E;--bgA:#2C2A1A;--bgB:#1C1626;--bgC:#2C2A1A}
+body.dark[data-tab=verbs]{--band:#3A2230;--on:#D3E3AE;--off:#C88AA3;--bgA:#3A2230;--bgB:#1D1A15;--bgC:#241A33}
+body.dark[data-tab=stats]{--band:#33262A;--on:#C9A6DE;--off:#9C7F78;--bgA:#33262A;--bgB:#221A31;--bgC:#2A281C}
+body.dark .card,body.dark .tile{background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.05));border-color:rgba(255,255,255,.12);box-shadow:0 6px 22px rgba(0,0,0,.35)}
+body.dark .card.sel{background:linear-gradient(145deg,rgba(253,253,201,.2),rgba(253,253,201,.08))}
+body.dark .flash{background:linear-gradient(160deg,#2E2342,#241A34);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+body.dark .flash hr{border-top-color:#3B2E4C}
+body.dark .seg{background:rgba(255,255,255,.08)}body.dark .seg button.on,body.dark .chips button.on{background:#8E5DB5;color:#fff}
+body.dark .chips button,body.dark .optbtn{background:#2A2038;border-color:#4A3A60;color:var(--plum)}
+body.dark input.f,body.dark input[type=search],body.dark #sheet input[type=text],body.dark #sheet textarea,body.dark #sheet select{background:#2A2038;color:var(--plum);border-color:#4A3A60}
+body.dark #sheet .box{background:linear-gradient(160deg,#2A2038,#20182E)}
+body.dark .soft{background:#4A3A60;color:#F3ECF8}body.dark .bar{background:rgba(255,255,255,.12)}
+body.dark .tag{background:#3B2E4C;color:#E6D5F2}body.dark .tag[style]{background:#2A2038!important}
+body.dark .lemon{background:#FDFDC9;color:#3B2A47;border-color:#E3DF96;box-shadow:0 6px 18px rgba(253,253,201,.12)}body.dark .primary{background:linear-gradient(180deg,#A877CB,#8E5DB5)}body.dark .undo{background:#F3ECF8;color:#2A2038}
+.card.row:active,.card.word:active{transform:scale(.985);transition:transform .08s}
+
+/* ---- Telegram look: uses the person's own Telegram theme colours ---- */
+body.tgs{--bg:var(--tg-theme-bg-color,#fff);--bg2:var(--tg-theme-secondary-bg-color,#efeff4);--sec:var(--tg-theme-section-bg-color,var(--bg));--txt:var(--tg-theme-text-color,#000);--hint:var(--tg-theme-hint-color,#8e8e93);--link:var(--tg-theme-link-color,#3390ec);--btn:var(--tg-theme-button-color,#3390ec);--btnt:var(--tg-theme-button-text-color,#fff);--sep:color-mix(in srgb,var(--hint) 25%,transparent);--tint:color-mix(in srgb,var(--btn) 14%,transparent);
+ --plum:var(--txt);--muted:var(--hint);--deep:var(--link);--pale:color-mix(in srgb,var(--btn) 14%,transparent);--band:var(--tg-theme-bottom-bar-bg-color,var(--bg));--on:var(--btn);--off:var(--hint);--bgA:var(--bg2);--bgB:var(--bg2);--bgC:var(--bg2);--lemon:var(--tint);--lemonB:transparent;--khaki:color-mix(in srgb,#34c759 22%,transparent);--khakiT:#2f9e4f;--cameo:color-mix(in srgb,#ff3b30 18%,transparent);--wine:#e5392f;color:var(--txt);background:var(--bg2)}
+body.tgs[data-tab]{--band:var(--tg-theme-bottom-bar-bg-color,var(--bg));--on:var(--btn);--off:var(--hint);--bgA:var(--bg2);--bgB:var(--bg2);--bgC:var(--bg2)}
+body.tgs h1{color:var(--txt);font-size:30px;letter-spacing:-.3px}
+body.tgs .sub{color:var(--hint)}
+body.tgs .card,body.tgs .tile{background:var(--sec);border:0;border-radius:12px;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+body.tgs .card.sel{background:var(--tint)}
+body.tgs .row small,body.tgs .word small,body.tgs td:first-child{color:var(--hint)}
+body.tgs .chev{color:var(--hint);font-size:22px}
+body.tgs .num{background:var(--tint);color:var(--btn)}body.tgs .num.done{background:var(--khaki);color:var(--khakiT)}
+body.tgs button{border-radius:12px;box-shadow:none}
+body.tgs .primary,body.tgs .lemon,body.tgs .khaki{background:var(--btn);color:var(--btnt);border:0;box-shadow:none}
+body.tgs .soft{background:var(--tint);color:var(--link)}
+body.tgs .good{background:var(--khaki);color:var(--khakiT)}body.tgs .bad{background:var(--cameo);color:var(--wine)}
+body.tgs .x{background:none;color:var(--link)}
+body.tgs nav{background:var(--band);border-top:1px solid var(--sep)}
+body.tgs nav button{color:var(--off)}body.tgs nav button.on{color:var(--on)}
+body.tgs .btnbar{background:transparent}
+body.tgs .seg{background:var(--tint);border-radius:10px;padding:3px}body.tgs .seg button{border-radius:8px;color:var(--txt)}body.tgs .seg button.on{background:var(--sec);color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+body.tgs .chips button,body.tgs .optbtn{background:var(--sec);border:1px solid var(--sep);color:var(--txt);border-radius:12px}body.tgs .chips button.on{background:var(--btn);color:var(--btnt);border-color:var(--btn)}
+body.tgs .optbtn.right{background:var(--khaki);border-color:#34c759}body.tgs .optbtn.wrong{background:var(--cameo);border-color:#ff3b30}
+body.tgs .flash{background:var(--sec);box-shadow:none;border-radius:20px}body.tgs .flash .big{color:var(--link)}body.tgs .flash .big.dark{color:var(--txt)}body.tgs .flash .en{color:var(--txt)}body.tgs .flash hr{border-top-color:var(--sep)}
+body.tgs input.f,body.tgs input[type=search],body.tgs #sheet input[type=text],body.tgs #sheet textarea,body.tgs #sheet select{background:var(--sec);color:var(--txt);border:1px solid var(--sep);border-radius:12px}
+body.tgs input[type=search]{box-shadow:none}
+body.tgs #sheet .box{background:var(--bg);border-radius:16px 16px 0 0}body.tgs #sheet h2{color:var(--txt)}
+body.tgs .bar{background:var(--sep);height:6px}body.tgs .bar i{background:var(--btn)}
+body.tgs .pill{background:var(--tint);color:var(--link)}body.tgs .pill.z{background:var(--cameo);color:var(--wine)}body.tgs .pill.hi{background:var(--btn);color:var(--btnt)}
+body.tgs .tag{background:var(--tint);color:var(--link)}body.tgs .tag[style]{background:var(--bg2)!important}
+body.tgs .switch{background:var(--sep)}body.tgs .switch.on{background:#34c759}
+body.tgs .back{color:var(--link)}body.tgs .linkbtn{color:#e5392f}body.tgs .undo{background:var(--txt);color:var(--bg)}
+body.tgs .tile span{color:var(--hint)}body.tgs .chart .cur i{background:var(--btn)}body.tgs .chart i{background:color-mix(in srgb,var(--btn) 45%,transparent)}
+body.tgs .hero{filter:none}
+body.tgs .prog{color:var(--hint)}
+
+/* ---- stronger buttons (all looks, light and dark) ---- */
+body.tgs .soft{background:color-mix(in srgb,var(--btn) 20%,var(--sec));color:var(--link);border:1.5px solid color-mix(in srgb,var(--btn) 50%,transparent)}
+body.tgs .good{border:1.5px solid color-mix(in srgb,#34c759 55%,transparent)}body.tgs .bad{border:1.5px solid color-mix(in srgb,#ff3b30 50%,transparent)}
+body.isdark.tgs .soft{background:color-mix(in srgb,var(--btn) 38%,var(--sec));color:#fff;border-color:color-mix(in srgb,var(--btn) 75%,#fff 10%)}
+body.isdark.tgs .bad{background:#7a2c36;color:#ffd9de;border-color:#d0606f}
+body.isdark.tgs .good{background:#2f5f3a;color:#dcf7e2;border-color:#52b86a}
+body.isdark.tgs .primary,body.isdark.tgs .lemon,body.isdark.tgs .khaki{box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+body.isdark.tgs .seg{background:color-mix(in srgb,#fff 12%,transparent)}body.isdark.tgs .seg button{color:#fff;opacity:.8}body.isdark.tgs .seg button.on{background:var(--btn);color:#fff;opacity:1;box-shadow:none}
+body.isdark.tgs .chips button,body.isdark.tgs .optbtn{border-color:color-mix(in srgb,#fff 38%,transparent);color:#fff}
+body.isdark.tgs .x{color:#fff}body.isdark.tgs nav button{color:#b9b9c2}body.isdark.tgs nav button.on{color:#fff}
+body.isdark.tgs .pill{background:color-mix(in srgb,var(--btn) 35%,transparent);color:#fff}
+body.isdark.tgs .linkbtn{color:#ff8c84}body.isdark.tgs .chev{color:#b9b9c2}
+body.dark .soft{background:#6B5590;color:#fff;border:1.5px solid #9A82C4}body.dark .bad{background:#7a2c4a;color:#ffd9e6;border:1.5px solid #c4607f}body.dark .good{background:#46622b;color:#e8f8cf;border:1.5px solid #86aa4c}
+body.dark .seg button{color:#fff;opacity:.85}body.dark .seg button.on{opacity:1}body.dark nav button{color:#BBA8D6}body.dark nav button.on{color:#FDFDC9}
+body.dark .chips button,body.dark .optbtn{border-color:#8A74B0;color:#fff}body.dark .x{color:#E6D5F2}
+</style></head>
+<body data-tab="memorize"><div id="sheet" onclick="if(event.target===this)closeSheet()"><div class="box" id="box"></div></div><div id="app"><main id="main"></main><div id="bar"></div><nav id="nav"></nav></div>
+<script>
+const tg = window.Telegram && Telegram.WebApp; if (tg) { try { tg.ready(); tg.expand(); } catch {} }
+const $ = s => document.querySelector(s);
+const esc = x => String(x ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const buzz = ok => { try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(ok ? 'success' : 'warning'); } catch {} };
+const tap = () => { try { tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred('light'); } catch {} };
+
+/* =================== DATA =================== */
+const fresh = () => ({ v: 2, t: 0, words: {}, lists: [], orphans: [], days: {}, vstat: {}, vpass: [], vbest: {}, myverbs: [], ex: false,
+  set: { lang: null, name: '', size: 20, kinds: ['es','en','type'], checkArt: true, chosen: [] } });
+let D = fresh();
+const cloud = (() => { try { return tg && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9') && tg.platform !== 'unknown' ? tg.CloudStorage : null; } catch { return null; } })();
+const CHUNK = 3500; const sent = {}; let saveTimer = null;
+function persistLocal() { try { localStorage.setItem('memo.data', JSON.stringify(D)); } catch {} }
+function save() { D.t = Date.now(); persistLocal(); clearTimeout(saveTimer); saveTimer = setTimeout(pushCloud, 700); }
+function pushCloud() {
+  if (!cloud) return;
+  try {
+    const j = JSON.stringify(D), n = Math.max(1, Math.ceil(j.length / CHUNK));
+    for (let i = 0; i < n; i++) { const part = j.slice(i * CHUNK, (i + 1) * CHUNK), k = 'data_' + i; if (sent[k] !== part) { cloud.setItem(k, part); sent[k] = part; } }
+    if (sent.data_n !== String(n)) { cloud.setItem('data_n', String(n)); sent.data_n = String(n); }
+  } catch {}
+}
+function loadLocal() {
+  try { const j = localStorage.getItem('memo.data'); if (j) { D = Object.assign(fresh(), JSON.parse(j)); D.set = Object.assign(fresh().set, D.set); return true; } } catch {}
+  return false;
+}
 function loadCloud(done) {
   if (!cloud) return done();
   try {
-    cloud.getItems(KEYS.map(k => k + '_n'), (e, counts) => {
-      if (e || !counts) return done();
-      const want = []; KEYS.forEach(k => { const n = +counts[k + '_n']; for (let i = 0; i < n; i++) want.push(`${k}_${i}`); });
-      if (!want.length) return done();
-      cloud.getItems(want, (e2, parts) => {
-        if (!e2 && parts) KEYS.forEach(k => { const n = +counts[k + '_n']; if (!n) return; let s = ''; for (let i = 0; i < n; i++) s += parts[`${k}_${i}`] || ''; try { JSON.parse(s); mem[k] = s; localStorage.setItem('memo.' + k, s); } catch {} });
+    cloud.getItem('data_n', (e, n) => {
+      n = +n; if (e || !n) return done();
+      const keys = Array.from({ length: n }, (_, i) => 'data_' + i);
+      cloud.getItems(keys, (e2, parts) => {
+        try { if (!e2 && parts) { const s = keys.map(k => parts[k] || '').join(''), c = JSON.parse(s); keys.forEach(k => sent[k] = parts[k]); sent.data_n = String(n); if ((c.t || 0) > (D.t || 0)) { D = Object.assign(fresh(), c); D.set = Object.assign(fresh().set, D.set); persistLocal(); } } } catch {}
         done();
       });
     });
   } catch { done(); }
 }
+function migrateOld() {
+  try {
+    const g = k => { const v = localStorage.getItem('memo.' + k); return v == null ? null : JSON.parse(v); };
+    const lang = g('lang'); if (lang) D.set.lang = lang;
+    const vp = g('vpass'); if (vp) D.vpass = vp;
+    const old = g('ratings') || {}, cust = g('custom') || [];
+    for (const l of cust) { const L = { id: uid(), name: l.name, c: Date.now(), m: [] }; D.lists.push(L); for (const w of l.words || []) addWord(L, w.es, w.en, w.ru); }
+    for (const [k, r] of Object.entries(old)) if (D.words[k]) D.words[k].r = r;
+  } catch {}
+}
 
-/* ---------- state ---------- */
-let lang, mode, custom, ratings, vpass, stats;
-function loadState() { lang = store.get('lang','en'); mode = store.get('mode','flip'); custom = store.get('custom',[]); ratings = store.get('ratings',{}); vpass = store.get('vpass',[]); stats = store.get('stats',{day:'',answered:0,correct:0}); }
-loadState();
-let base = [], verbs = [], tab = 'memorize', view = null, session = null, chosen = new Set(), q = '', vq = null;
+/* =================== TEXT =================== */
+const lang = () => D.set.lang || 'en';
+const L = (en, ru) => lang() === 'ru' ? ru : en;
+const plural = (n, one, few, many) => { const a = n % 100, b = n % 10; if (a >= 11 && a <= 14) return many; if (b === 1) return one; if (b >= 2 && b <= 4) return few; return many; };
+const wordCount = n => lang() === 'ru' ? `${n} ${plural(n, 'слово', 'слова', 'слов')}` : `${n} ${n === 1 ? 'word' : 'words'}`;
+const uid = () => Math.random().toString(36).slice(2, 9);
 
-/* ---------- text ---------- */
-const T = {'Memorize':'Учить','Lists':'Списки','Choose lists':'Выберите списки','‹ Back':'‹ Назад','Not yet':'Ещё нет','Knew it':'Знаю','Show answer':'Показать ответ','Done':'Готово','Search':'Поиск','Choose lists and memorize':'Выберите списки и учите','words':'слов','Check':'Проверить','Create list':'Создать список','Add word':'Добавить слово','Spanish':'По-испански','Meaning':'Значение','Typing':'Ввод','Cards':'Карточки','Settings':'Настройки','Verbs':'Глаголы','known':'известно','of':'из','Your answer':'Ваш ответ','swipe right or tap to show the answer':'свайп вправо или нажмите, чтобы увидеть ответ','Right!':'Верно!','Not quite':'Не совсем','Next':'Дальше','List name':'Название списка','Language':'Язык','Card type':'Тип карточек','Start':'Начать','Example lists':'Примеры списков','My lists':'Мои списки','No words yet':'Пока нет слов','¡Hola amiga!':'¡Hola!','Today':'Сегодня','answers':'ответов','correct':'верных','Words you know':'Известных слов','Verb levels passed':'Пройдено уровней','Present tense':'Настоящее время','levels done':'уровней пройдено','Learn':'Учить','Start quiz':'Начать тест','Practice':'Практика','Level passed!':'Уровень пройден!','Try again':'Ещё раз','Type the form':'Введите форму','Answer needs 80% to pass':'Для прохода нужно 80%','right answer':'верный ответ','Passed this level to unlock the next':'Пройдите уровень, чтобы открыть следующий','Delete list':'Удалить список','Delete this list?':'Удалить этот список?'};
-const t = s => (lang === 'ru' && T[s]) || s;
-const esc = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
-const key = es => es.toLowerCase().replace(/^(el|la|los|las|un|una)\s+/,'');
-const rate = es => ratings[key(es)] || 0;
-const art = (n, c) => `<img ${c ? `class="${c}" ` : ''}src="art/${n}.svg" alt="">`;
-const article = es => ({el:'el',los:'el',un:'el',la:'la',las:'la',una:'la'})[es.split(' ')[0].toLowerCase()];
-const spanishHtml = es => { const a = article(es); if (!a) return esc(es); const [f, ...r] = es.split(' '); return `<span class="${a}">${esc(f)}</span> ${esc(r.join(' '))}`; };
-const meaning = w => { if (lang === 'ru') return w.ru || w.en || ''; const f = w.es.split(' ')[0].toLowerCase(); return ['el','la','los','las'].includes(f) && !/^the /.test(w.en) ? 'the ' + w.en : w.en; };
-const all = () => [...base, ...custom];
-const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[¡!¿?.,]/g, '').trim();
-const today = () => new Date().toISOString().slice(0,10);
+/* =================== SPANISH HELPERS =================== */
+const ARTS = new Set(['el','la','los','las','un','una','unos','unas']);
+const PUNCT = /[¿¡?!.,;:"']/g;
+const normalize = t => t.toLowerCase().replace(PUNCT, '').split(/\s+/).filter(Boolean).join(' ');
+const clean = t => { const p = normalize(t).split(' ').filter(Boolean); if (p.length > 1 && ARTS.has(p[0])) p.shift(); return p.join(' '); };
+const fold = t => t.replace(/[áàä]/g, 'a').replace(/[éèë]/g, 'e').replace(/[íìï]/g, 'i').replace(/[óòö]/g, 'o').replace(/[úùü]/g, 'u');
+const leadArt = t => { const p = normalize(t).split(' '); return p.length > 1 && ARTS.has(p[0]) ? p[0] : null; };
+function checkTyped(typed, answer, checkArt) {
+  const given = checkArt ? normalize(typed) : clean(typed), expected = checkArt ? normalize(answer) : clean(answer);
+  if (!given) return 'wrong';
+  const artDiff = !checkArt && leadArt(typed) !== leadArt(answer);
+  if (given === expected) return artDiff ? 'article' : 'correct';
+  if (fold(given) === fold(expected)) return artDiff ? 'article' : 'accent';
+  return 'wrong';
+}
+const isGood = r => r !== 'wrong';
+const artKind = es => { const f = es.split(' ')[0].toLowerCase(); return ({ el:'el', los:'el', un:'el', unos:'el', la:'la', las:'la', una:'la', unas:'la' })[f]; };
+const spHtml = es => { const a = artKind(es); if (!a || es.split(' ').length < 2) return esc(es); const [f, ...r] = es.split(' '); return `<span class="${a}">${esc(f)}</span> ${esc(r.join(' '))}`; };
+const withThe = (es, en) => { const f = es.split(' ')[0].toLowerCase(); return ['el','la','los','las'].includes(f) && es.split(' ').length > 1 && !/^the /i.test(en) ? 'the ' + en : en; };
+const meaningOf = w => lang() === 'ru' ? (w.ru || w.en || '') : (w.en || w.ru || '');
 
-/* ---------- verbs: the same present-tense rules as the iPhone app ---------- */
-const ENDS = {ar:['o','as','a','amos','áis','an'], er:['o','es','e','emos','éis','en'], ir:['o','es','e','imos','ís','en']};
+/* =================== LIBRARY =================== */
+const wk = es => clean(es);
+function addWord(list, es, en, ru) {
+  const k = wk(es); let w = D.words[k];
+  if (!w) w = D.words[k] = { es, en: en || ru || '', ru: ru || en || '', r: 0, rest: null, c: Date.now() };
+  const m = list.m.find(x => x.k === k);
+  if (m) { m.a = 0; delete m.at; } else list.m.push({ k, a: 0 });
+  return w;
+}
+const activeM = list => list.m.filter(x => !x.a && D.words[x.k]);
+const activeWords = list => activeM(list).map(x => D.words[x.k]);
+const listById = id => D.lists.find(l => l.id === id);
+const otherLists = (w, list) => D.lists.filter(l => l !== list && l.m.some(x => x.k === wk(w.es) && !x.a)).map(l => l.name);
+function archiveWord(list, k) { const m = list.m.find(x => x.k === k); if (m) { m.a = 1; m.at = Date.now(); } }
+function unarchive(row) {
+  if (row.list) { const m = row.list.m.find(x => x.k === row.k); if (m) { m.a = 0; delete m.at; } return; }
+  const o = D.orphans.find(x => x === row.orphan); if (!o) return;
+  let list = D.lists.find(l => l.name === o.ln);
+  if (!list) { list = { id: uid(), name: o.ln, c: Date.now(), m: [] }; D.lists.push(list); }
+  const m = list.m.find(x => x.k === o.k); if (m) { m.a = 0; delete m.at; } else list.m.push({ k: o.k, a: 0 });
+  D.orphans.splice(D.orphans.indexOf(o), 1);
+}
+function deleteForever(row) {
+  if (row.list) row.list.m = row.list.m.filter(x => x.k !== row.k); else D.orphans.splice(D.orphans.indexOf(row.orphan), 1);
+  const still = D.lists.some(l => l.m.some(x => x.k === row.k)) || D.orphans.some(o => o.k === row.k);
+  if (!still) delete D.words[row.k];
+}
+function deleteList(list) { for (const m of list.m) D.orphans.push({ k: m.k, ln: list.name, at: m.at || Date.now() }); D.lists.splice(D.lists.indexOf(list), 1); }
+function archivedRows() {
+  const rows = [];
+  for (const l of D.lists) for (const m of l.m) if (m.a && D.words[m.k]) rows.push({ k: m.k, list: l, label: l.name });
+  for (const o of D.orphans) if (D.words[o.k]) rows.push({ k: o.k, orphan: o, label: o.ln + ' (' + L('deleted', 'удалён') + ')' });
+  return rows;
+}
+const fullyArchived = k => { const refs = D.lists.flatMap(l => l.m.filter(x => x.k === k)); return (refs.length + D.orphans.filter(o => o.k === k).length) > 0 && !refs.some(x => !x.a); };
+const nameTaken = (n, except) => D.lists.some(l => l !== except && l.name.trim().toLowerCase() === n.trim().toLowerCase());
+
+/* =================== SCHEDULER =================== */
+const MAXR = 10;
+const weight = w => Math.pow(0.7, w.r);
+const restDays = r => r < 5 ? null : r === 5 ? 1 : r === 6 ? 3 : r === 7 ? 7 : 14;
+const resting = w => !!w.rest && w.rest > Date.now();
+function wakeUp(words) { for (const w of words) if (w.rest && w.rest <= Date.now()) { w.r = Math.max(0, w.r - 1); w.rest = null; } }
+function applyAnswer(w, ok) {
+  if (ok) { w.r = Math.min(MAXR, w.r + 1); const d = restDays(w.r); if (d) w.rest = Date.now() + d * 86400000; } else { w.r = Math.max(0, w.r - 1); w.rest = null; }
+}
+function weightedPick(arr, wf) { const tot = arr.reduce((s, x) => s + wf(x), 0); if (tot <= 0) return arr[Math.floor(Math.random() * arr.length)]; let roll = Math.random() * tot; for (const x of arr) { roll -= wf(x); if (roll < 0) return x; } return arr[arr.length - 1]; }
+function buildSession(words, size, kinds) {
+  if (!words.length || size <= 0 || !kinds.length) return [];
+  const total = Math.min(size, words.length * kinds.length), used = new Map(), cards = []; let last = null;
+  while (cards.length < total) {
+    let cand = words.filter(w => (used.get(w)?.size || 0) < kinds.length);
+    const unused = cand.filter(w => !used.has(w)); if (unused.length) cand = unused;
+    if (cand.length > 1 && last) cand = cand.filter(w => w !== last);
+    if (!cand.length) break;
+    const w = weightedPick(cand, weight), seen = used.get(w) || new Set(), opts = kinds.filter(k => !seen.has(k));
+    if (!opts.length) break;
+    const kind = opts[Math.floor(Math.random() * opts.length)]; seen.add(kind); used.set(w, seen); cards.push({ w, kind }); last = w;
+  }
+  return cards;
+}
+/* days and time */
+const dayKey = (d = new Date()) => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return z.toISOString().slice(0, 10); };
+const dayStat = () => D.days[dayKey()] || (D.days[dayKey()] = { s: 0, a: 0, c: 0 });
+function formatDuration(sec) { sec = Math.round(sec); if (sec < 60) return sec + (lang() === 'ru' ? ' с' : ' s'); const m = Math.round(sec / 60); if (m < 60) return m + (lang() === 'ru' ? ' мин' : ' min'); return Math.floor(m / 60) + (lang() === 'ru' ? ' ч ' : ' h ') + (m % 60) + (lang() === 'ru' ? ' мин' : ' min'); }
+function streak() {
+  const studied = new Set(Object.entries(D.days).filter(([, v]) => v.a > 0).map(([k]) => k)); let d = new Date(); if (!studied.has(dayKey(d))) d.setDate(d.getDate() - 1);
+  let n = 0; while (studied.has(dayKey(d))) { n++; d.setDate(d.getDate() - 1); } return n;
+}
+
+/* =================== VERBS ENGINE =================== */
+const ENDS = { ar:['o','as','a','amos','áis','an'], er:['o','es','e','emos','éis','en'], ir:['o','es','e','imos','ís','en'] };
 const PRON = ['me','te','se','nos','os','se'];
 const PERSONS = ['yo','tú','él · ella · usted','nosotros','vosotros','ellos · ustedes'];
 const PERSONS_CARD = ['yo','tú','él / ella / usted','nosotros','vosotros','ellos / ustedes'];
 const ME_EN = ['I','you','he / she','we','you all','they'], ME_RU = ['я','ты','он / она','мы','вы','они'];
-const STEM = {'e-ie':['e','ie'],'o-ue':['o','ue'],'e-i':['e','i'],'u-ue':['u','ue']};
-function splitRefl(v) { v = v.toLowerCase(); if (v.length > 4 && v.endsWith('se') && /(ar|er|ir|ír)$/.test(v.slice(0,-2))) return [v.slice(0,-2), true]; return [v, false]; }
-function withPron(forms, refl) { return refl ? forms.map((f,i) => f && PRON[i] + ' ' + f) : forms; }
+const STEM = { 'e-ie':['e','ie'], 'o-ue':['o','ue'], 'e-i':['e','i'], 'u-ue':['u','ue'] };
+const STEM_LABEL = { 'e-ie':'e → ie', 'o-ue':'o → ue', 'e-i':'e → i', 'u-ue':'u → ue' };
+let CATALOG = [], BYINF = {};
+const looksInf = w => w.length >= 3 && /^[a-záéíóúñü]+$/i.test(w) && /(ar|er|ir|ír)$/.test(w);
+function splitRefl(v) { v = v.toLowerCase(); if (v.length > 4 && v.endsWith('se') && looksInf(v.slice(0, -2))) return [v.slice(0, -2), true]; return [v, false]; }
+const withPron = (forms, refl) => refl ? forms.map((f, i) => f && PRON[i] + ' ' + f) : forms;
 function yoSpell(yo, base) {
-  if (/(cer|cir)$/.test(base)) { const before = base[base.length - 4] || 'x'; const st = yo.slice(0,-2); return 'aeiouáéíóú'.includes(before) ? st + 'zco' : st + 'zo'; }
-  if (/(ger|gir)$/.test(base)) return yo.slice(0,-2) + 'jo';
-  if (base.endsWith('guir')) return yo.slice(0,-3) + 'go';
+  if (/(cer|cir)$/.test(base)) { const before = base[base.length - 4] || 'x', st = yo.slice(0, -2); return 'aeiouáéíóú'.includes(before) ? st + 'zco' : st + 'zo'; }
+  if (/(ger|gir)$/.test(base)) return yo.slice(0, -2) + 'jo';
+  if (base.endsWith('guir')) return yo.slice(0, -3) + 'go';
   return yo;
 }
-function conjugate(v) {
-  const [base, refl] = splitRefl(v.i);
-  if (v.k === 'table') return withPron(v.f, refl);
-  const end = base.slice(-2), ends = ENDS[end]; if (!ends) return Array(6).fill(null);
-  const stem = base.slice(0,-2);
-  const forms = ends.map((e, p) => { let s = stem; if (STEM[v.k] && p !== 3 && p !== 4) { const [from, to] = STEM[v.k]; const i = s.lastIndexOf(from); if (i >= 0) s = s.slice(0,i) + to + s.slice(i+1); } return s + e; });
+function conjugate(inf, kind) {   // kind: {k, f}
+  const [base, refl] = splitRefl(inf);
+  if (kind.k === 'table') return withPron(kind.f.slice(), refl);
+  const ends = ENDS[base.slice(-2)]; if (!ends) return Array(6).fill(null);
+  const stem = base.slice(0, -2);
+  const forms = ends.map((e, p) => { let s = stem; if (STEM[kind.k] && p !== 3 && p !== 4) { const [from, to] = STEM[kind.k], i = s.lastIndexOf(from); if (i >= 0) s = s.slice(0, i) + to + s.slice(i + 1); } return s + e; });
   forms[0] = yoSpell(forms[0], base);
-  if (base.endsWith('uir') && !/(guir|quir)$/.test(base)) [0,1,2,5].forEach(p => { const f = forms[p], cut = f.length - ends[p].length, i = f.lastIndexOf('u', cut - 1); if (i >= 0) forms[p] = f.slice(0,i) + 'uy' + f.slice(i+1); });
+  if (base.endsWith('uir') && !/(guir|quir)$/.test(base)) [0,1,2,5].forEach(p => { const f = forms[p], cut = f.length - ends[p].length, i = f.lastIndexOf('u', cut - 1); if (i >= 0) forms[p] = f.slice(0, i) + 'uy' + f.slice(i + 1); });
   return withPron(forms, refl);
 }
-function regularForms(v) { const [base, refl] = splitRefl(v.i); const ends = ENDS[base.slice(-2).replace('í','i')]; if (!ends) return Array(6).fill(null); return withPron(ends.map(e => base.slice(0,-2) + e), refl); }
-const vMean = v => lang === 'ru' ? v.ru : v.en;
+function regularForms(inf) { const [base, refl] = splitRefl(inf), ends = ENDS[base.slice(-2).replace('í', 'i')]; if (!ends) return Array(6).fill(null); return withPron(ends.map(e => base.slice(0, -2) + e), refl); }
+const COMPOUND = ['tener','venir','decir','hacer','poner','traer','salir','valer','volver','mover','seguir','sentir','pedir','contar','poder','querer'];
+function compound(inf) {
+  const [word] = splitRefl(inf);
+  for (const base of COMPOUND) if (word.endsWith(base) && word !== base) { const p = word.slice(0, -base.length), b = BYINF[base]; if (p.length >= 1 && p.length <= 5 && b) return b.k === 'table' ? { kind: { k: 'table', f: b.f.map(x => x && p + x) }, base } : { kind: { k: b.k }, base }; }
+  return null;
+}
+function kindLabel(kind, inf, base) {
+  if (kind.k === 'regular') { const b = splitRefl(inf)[0]; if (/(cer|cir)$/.test(b)) return 'aeiouáéíóú'.includes(b.slice(0, -3).slice(-1)) ? 'yo -zco' : 'yo -zo'; if (b.endsWith('uir') && !b.endsWith('guir')) return '-uir: y'; return L('regular', 'правильный'); }
+  if (STEM[kind.k]) return STEM_LABEL[kind.k];
+  return base ? L('like ' + base, 'как ' + base) : L('irregular', 'неправильный');
+}
+function kindFromRaw(raw, inf) {
+  if (raw === 'regular') return { k: 'regular' };
+  if (raw === 'irregular') { const b = BYINF[inf]; if (b && b.k === 'table') return { k: 'table', f: b.f }; const c = compound(inf); if (c && c.kind.k === 'table') return c.kind; return { k: 'table', f: regularForms(inf) }; }
+  return STEM[raw] ? { k: raw } : null;
+}
+function verbItem(inf, meaning, raw, custom) {   // like VerbBook.item
+  inf = inf.trim().toLowerCase(); const b = BYINF[inf], c = b ? null : compound(inf);
+  let kind, label, guessed = false;
+  const chosen = raw ? kindFromRaw(raw, inf) : null;
+  if (chosen) { kind = chosen; label = kindLabel(chosen, inf, c && c.base); }
+  else if (b) { kind = b.k === 'table' ? { k: 'table', f: b.f } : { k: b.k }; label = kindLabel(kind, inf, null); }
+  else if (c) { kind = c.kind; label = L('like ' + c.base, 'как ' + c.base); }
+  else { kind = { k: 'regular' }; label = kindLabel(kind, inf, null); guessed = true; }
+  const forms = conjugate(inf, kind); (custom || []).forEach((f, i) => { if (i < 6 && f && f.trim()) forms[i] = f.trim(); });
+  return { inf, meaning: meaning ?? (b ? (lang() === 'ru' ? b.ru : b.en) : ''), forms, label, guessed, level: b ? b.l : 0, kind };
+}
+const usedPersons = it => [0,1,2,3,4,5].filter(p => it.forms[p] != null);
+const levelVerbs = n => CATALOG.filter(v => v.l === n);
+const isInfinitive = es => { const w = es.trim().toLowerCase(); return !w.includes(' ') && looksInf(splitRefl(w)[0]); };
+function isVerbWord(es, meaning) {
+  if (!isInfinitive(es)) return false; if (BYINF[es.trim().toLowerCase()]) return true;
+  const m = (meaning || '').trim().toLowerCase(); if (!m) return true; if (m.startsWith('to ')) return true;
+  return ['ть','ться','тись','чь','чься','ти'].some(s => m.endsWith(s));
+}
+function checkVerb(typed, answer) { const g = normalize(typed), e = normalize(answer); if (!g) return 'wrong'; if (g === e) return 'correct'; if (fold(g) === fold(e)) return 'accent'; return 'wrong'; }
 const LEVELS = [
  ['Regular -ar','Правильные на -ar',"Drop -ar, add the ending:\n-o · -as · -a · -amos · -áis · -an","Уберите -ar и добавьте окончание:\n-o · -as · -a · -amos · -áis · -an"],
  ['Regular -er','Правильные на -er',"Drop -er, add the ending:\n-o · -es · -e · -emos · -éis · -en","Уберите -er и добавьте окончание:\n-o · -es · -e · -emos · -éis · -en"],
@@ -157,157 +390,467 @@ const LEVELS = [
  ['ir, haber, oír, -uir','ir, haber, oír, -uir',"ir is fully irregular: voy, vas, va… haber here is hay (there is / there are). oír: oigo, oyes. -uir verbs add y: construyo.","ir полностью неправильный: voy, vas, va… haber здесь — hay (есть, имеется). oír: oigo, oyes. Глаголы на -uir добавляют y: construyo."],
  ['gustar & reflexive','gustar и возвратные',"gustar works the other way round: me gusta (I like it), te gusta, le gusta… Reflexive verbs take me, te, se, nos, os, se: me levanto.","gustar строится наоборот: me gusta (мне нравится), te gusta, le gusta… Возвратные глаголы берут me, te, se, nos, os, se: me levanto."]
 ];
-const lvTitle = i => LEVELS[i-1][lang === 'ru' ? 1 : 0], lvRule = i => LEVELS[i-1][lang === 'ru' ? 3 : 2];
-const lvVerbs = i => verbs.filter(v => v.l === i);
+const lvTitle = n => LEVELS[n - 1][lang() === 'ru' ? 1 : 0], lvRule = n => LEVELS[n - 1][lang() === 'ru' ? 3 : 2];
+const lvExamples = n => { const v = levelVerbs(n); return v.slice(0, 3).map(x => x.i).join(', ') + (v.length > 3 ? '…' : ''); };
+const vUnlocked = n => n === 1 || D.vpass.includes(n) || D.vpass.includes(n - 1);
+const currentLevel = () => { for (let n = 1; n <= 12; n++) if (!D.vpass.includes(n)) return n; return 12; };
+const vkey = (inf, p) => inf + '|' + p;
+function recordLevel(n, pct) { D.vbest[n] = Math.max(D.vbest[n] || 0, pct); if (pct >= 80 && !D.vpass.includes(n)) D.vpass.push(n); }
+const catalogItem = v => verbItem(v.i);
+function reviewItems() {
+  const fromLevels = D.vpass.slice().sort((a, b) => a - b).flatMap(n => levelVerbs(n).map(catalogItem)), seen = new Set();
+  return [...fromLevels, ...D.myverbs.map(e => verbItem(e.i, e.m, e.k, e.f))].filter(it => !seen.has(it.inf) && seen.add(it.inf));
+}
+function listVerbItems(lists) {
+  const seen = new Set(), out = [];
+  for (const l of lists) for (const w of activeWords(l)) { if (!isVerbWord(w.es, meaningOf(w))) continue; const inf = w.es.trim().toLowerCase(); if (seen.has(inf)) continue; seen.add(inf); out.push(verbItem(inf, meaningOf(w))); }
+  return out;
+}
+function buildVerbCards(items, size) {
+  const pool = items.flatMap(it => usedPersons(it).map(p => [it, p]));
+  if (!pool.length) return [];
+  const total = Math.min(size, pool.length * 2), used = {}, cards = []; let lastV = null, lastP = null;
+  const wt = ([it, p]) => { const s = D.vstat[vkey(it.inf, p)]; return Math.pow(0.7, s ? s.r : 0) * (1 + Math.min(s ? s.m : 0, 5) * 0.3); };
+  while (cards.length < total) {
+    const fewest = Math.min(...pool.map(([it, p]) => used[vkey(it.inf, p)] || 0));
+    let cand = pool.filter(([it, p]) => (used[vkey(it.inf, p)] || 0) === fewest);
+    if (cand.some(c => c[0].inf !== lastV)) cand = cand.filter(c => c[0].inf !== lastV);
+    if (cand.some(c => c[1] !== lastP)) cand = cand.filter(c => c[1] !== lastP);
+    const [it, p] = weightedPick(cand, wt); used[vkey(it.inf, p)] = (used[vkey(it.inf, p)] || 0) + 1; lastV = it.inf; lastP = p;
+    const ans = it.forms[p], others = [...new Set(it.forms.filter(f => f && f !== ans))];
+    const kinds = ['conj', 'conj', 'conj']; if (it.meaning) kinds.push('trans', 'trans'); if (others.length >= 3) kinds.push('choice', 'choice');
+    const kind = kinds[Math.floor(Math.random() * kinds.length)];
+    const options = kind === 'choice' ? [...others.sort(() => Math.random() - .5).slice(0, 3), ans].sort(() => Math.random() - .5) : [];
+    cards.push({ it, p, kind, options, ans });
+  }
+  return cards;
+}
 
-Promise.all([fetch('examples.json').then(r => r.json()), fetch('verbs.json').then(r => r.json())]).then(([d, v]) => { base = d.lists; verbs = v; loadCloud(() => { loadState(); render(); }); });
-
-/* ---------- shell ---------- */
+/* =================== NAVIGATION =================== */
+let tab = 'memorize'; const stacks = { memorize: [], lists: [], verbs: [], stats: [] };
+const cur = () => stacks[tab][stacks[tab].length - 1] || { n: tab === 'memorize' ? 'home' : tab === 'lists' ? 'lists' : tab === 'verbs' ? 'verbs' : 'stats', p: {} };
+function go(n, p) { stacks[tab].push({ n, p: p || {} }); render(); }
+function back() { stacks[tab].pop(); render(); }
+function resetTo(n, p) { stacks[tab] = n ? [{ n, p: p || {} }] : []; render(); }
+function setTab(t) { tap(); tab = t; stacks[t] = []; Q = null; S = null; render(); }
 const ICONS = {
   memorize: '<rect x="3" y="8" width="14" height="12" rx="3"/><path d="M7 8V7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-1"/>',
   lists: '<path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/>',
   verbs: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"/><path d="M8 20a3 3 0 0 1 0-6h11"/><path d="m9 9 1.5-3L12 9m-2.3-.8h1.6"/>',
   stats: '<rect x="3" y="12" width="5" height="8" rx="1.5"/><rect x="9.5" y="4" width="5" height="16" rx="1.5"/><rect x="16" y="9" width="5" height="11" rx="1.5"/>'
 };
-function nav() { document.body.dataset.tab = tab; $('#nav').innerHTML = Object.keys(ICONS).map(x => `<button class="${tab===x?'on':''}" onclick="go('${x}')"><svg viewBox="0 0 24 24">${ICONS[x]}</svg></button>`).join(''); }
-function go(x) { tab = x; view = null; vq = null; session = null; render(); }
+function nav() { document.body.dataset.tab = tab; $('#nav').innerHTML = Object.keys(ICONS).map(x => `<button class="${tab === x ? 'on' : ''}" onclick="setTab('${x}')"><svg viewBox="0 0 24 24">${ICONS[x]}</svg></button>`).join(''); }
+const SCREENS = {};
 function render() {
-  nav(); const m = $('#main'), b = $('#bar'); b.innerHTML = ''; m.scrollTop = 0;
-  if (vq) return vq.done ? vquizDone(m, b) : vquizCard(m, b);
-  if (session) return renderCard(m, b);
-  if (tab === 'memorize') return view === 'pick' ? pick(m, b) : home(m, b);
-  if (tab === 'lists') return view === null ? listsView(m, b) : listView(m, b);
-  if (tab === 'verbs') return view === null ? verbsHome(m, b) : verbLearn(m, b);
-  settings(m);
+  nav(); const m = $('#main'), b = $('#bar'); b.innerHTML = ''; m.scrollTop = 0; clearInterval(choiceTimer);
+  if (!D.set.lang || !D.set.name) return welcome(m, b);
+  const c = cur(); (SCREENS[c.n] || SCREENS.home)(m, b, c.p); applyChrome();
 }
+const art = (n, c) => `<img ${c ? `class="${c}" ` : ''}src="art/${n}.svg" alt="">`;
+const nativeBack = (() => { try { return !!(tg && tg.BackButton && tg.isVersionAtLeast('6.1') && tg.platform !== 'unknown'); } catch { return false; } })();
+const backLink = () => nativeBack ? '' : `<span class="back" onclick="back()">${L('‹ Back', '‹ Назад')}</span>`;
+const inTg = !!(tg && tg.platform && tg.platform !== 'unknown');
+function applyChrome() {
+  const tgs = (D.set.look || 'tg') === 'tg', systemDark = inTg ? tg.colorScheme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.body.classList.toggle('tgs', tgs); document.body.classList.toggle('isdark', !!systemDark); document.body.classList.toggle('dark', !tgs && systemDark);
+  if (tgs && !inTg) { const r = document.documentElement.style, d = systemDark; const v = d ? { 'bg-color': '#212121', 'secondary-bg-color': '#0f0f0f', 'section-bg-color': '#212121', 'text-color': '#fff', 'hint-color': '#8d8d93', 'link-color': '#6ab3f3', 'button-color': '#8774e1', 'button-text-color': '#fff', 'bottom-bar-bg-color': '#212121' } : { 'bg-color': '#fff', 'secondary-bg-color': '#efeff4', 'section-bg-color': '#fff', 'text-color': '#000', 'hint-color': '#8e8e93', 'link-color': '#3390ec', 'button-color': '#3390ec', 'button-text-color': '#fff', 'bottom-bar-bg-color': '#fff' }; for (const k in v) r.setProperty('--tg-theme-' + k, v[k]); }
+  if (!inTg) return;
+  if (tgs) { try { tg.setHeaderColor('secondary_bg_color'); tg.setBackgroundColor('secondary_bg_color'); tg.setBottomBarColor('bottom_bar_bg_color'); } catch {} }
+  else { const cs = getComputedStyle(document.body), band = cs.getPropertyValue('--band').trim(), bg = cs.getPropertyValue('--bgB').trim(); try { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch {} try { tg.setBottomBarColor(band); } catch {} }
+  if (nativeBack) { const deep = stacks[tab].length > 0 || S && !S.done || Q; try { deep ? tg.BackButton.show() : tg.BackButton.hide(); } catch {} }
+}
+if (tg) { try { tg.onEvent('themeChanged', applyChrome); if (nativeBack) tg.BackButton.onClick(() => { if (S && S.done) { S = null; } if (Q && Q.done) { Q = null; } back(); }); } catch {} }
+const bar = html => { $('#bar').innerHTML = `<div class="btnbar">${html}</div>`; };
+function openSheet(html) { $('#box').innerHTML = html; $('#sheet').classList.add('on'); }
+function closeSheet() { $('#sheet').classList.remove('on'); }
+function confirmBox(title, msg, ok, fn) { try { if (tg && tg.showConfirm && tg.isVersionAtLeast('6.2') && tg.platform !== 'unknown') { tg.showPopup({ title: String(title).slice(0, 64), message: String(msg || ' ').slice(0, 256), buttons: [{ id: 'ok', type: 'destructive', text: ok }, { type: 'cancel' }] }, id => { if (id === 'ok') fn(); }); return; } } catch {} window._ok = () => { closeSheet(); fn(); }; openSheet(`<h2>${esc(title)}</h2><p class="hintx">${esc(msg)}</p><div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button><button class="bad" onclick="_ok()">${esc(ok)}</button></div>`); }
+function toast(msg) { const el = document.createElement('div'); el.className = 'undo'; el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2200); }
 
-/* ---------- memorize ---------- */
-function home(m, b) {
-  m.innerHTML = `<h1>${t('¡Hola amiga!')}</h1><p class="sub">${t('Choose lists and memorize')}</p>${art('hello','hero')}`;
-  b.innerHTML = `<div class="btnbar"><button class="lemon" onclick="view='pick';render()">${t('Memorize')}</button></div>`;
-}
-function pick(m, b) {
-  m.innerHTML = `<span class="back" onclick="view=null;render()">${t('‹ Back')}</span><h1>${t('Choose lists')}</h1>` +
-    all().map((l, i) => `<div class="card row" onclick="toggle(${i})"><div><b>${esc(l.name)}</b><small>${l.words.length} ${t('words')}</small></div><span class="chev">${chosen.has(i)?'●':'○'}</span></div>`).join('');
-  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="start()" ${chosen.size?'':'disabled style="opacity:.5"'}>${t('Start')}</button></div>`;
-}
-function toggle(i) { chosen.has(i) ? chosen.delete(i) : chosen.add(i); const y = $('#main').scrollTop; render(); $('#main').scrollTop = y; }
-function start() {
-  const L = all(), seen = new Set(), pool = [];
-  for (const i of chosen) for (const w of (L[i] || {words:[]}).words) if (!seen.has(key(w.es))) { seen.add(key(w.es)); pool.push(w); }
-  const cards = pool.map(w => ({ w, s: Math.random() * (1 + rate(w.es)) })).sort((a, b) => a.s - b.s).slice(0, 20).map(x => x.w);
-  session = { cards, i: 0, shown: false, ok: 0, result: null }; render();
-}
-function renderCard(m, b) {
-  const s = session;
-  if (s.i >= s.cards.length) {
-    m.innerHTML = `<h1 class="center">¡Muy bien!</h1><p class="sub center">${s.ok} ${t('of')} ${s.cards.length} ${t('known')}</p>${art('face-hearts','hero')}`;
-    b.innerHTML = `<div class="btnbar"><button class="primary" onclick="session=null;view=null;render()">${t('Done')}</button></div>`; return;
+/* =================== WELCOME (first launch) =================== */
+function welcome(m, b) {
+  if (!D.set.lang) {
+    m.innerHTML = `<div class="homewrap"><h1>memo</h1><p class="sub" style="margin:0">Language · Язык</p>${art('hello', 'hero')}</div>`;
+    b.innerHTML = `<div class="btnbar"><button class="lemon" onclick="pickLang('en')">English</button><button class="soft" style="flex:1" onclick="pickLang('ru')">Русский</button></div>`; return;
   }
-  const w = s.cards[s.i], typing = mode === 'type';
-  const back = s.shown ? `<div class="en">${esc(meaning(w))}</div>` : '';
-  const fb = s.result == null ? '' : `<div class="fb ${s.result?'ok':'no'}">${s.result ? t('Right!') : t('Not quite')}</div>`;
-  m.innerHTML = `<p class="prog">${s.i+1} / ${s.cards.length}</p><div class="bar"><i style="width:${s.i/s.cards.length*100}%"></i></div><div class="flash" id="flash" ${typing?'':'onclick="reveal()"'}>
-    ${art('peek-happy','peek')}<div><div class="es">${spanishHtml(w.es)}</div>${back}${fb}</div>
-    ${s.shown || typing ? '' : `<div class="hint">${t('swipe right or tap to show the answer')}</div>`}</div>` +
-    (typing && !s.shown ? `<input class="f" id="ans" placeholder="${t('Your answer')}" autocomplete="off" autocapitalize="off">` : '');
-  if (typing && !s.shown) { b.innerHTML = `<div class="btnbar"><button class="primary" onclick="check()">${t('Check')}</button></div>`; setTimeout(() => { const a = $('#ans'); if (a) { a.focus(); a.addEventListener('keydown', e => e.key === 'Enter' && check()); } }, 0); return; }
-  if (typing) { b.innerHTML = `<div class="btnbar"><button class="primary" onclick="answer(session.result)">${t('Next')}</button></div>`; return; }
-  b.innerHTML = s.shown ? `<div class="btnbar"><button class="bad" onclick="answer(false)">${t('Not yet')}</button><button class="good" onclick="answer(true)">${t('Knew it')}</button></div>`
-                        : `<div class="btnbar"><button class="soft" onclick="redo()">↶</button><button class="lemon" onclick="reveal()">${t('Show answer')}</button></div>`;
+  m.innerHTML = `<div class="homewrap">${art('face-hearts', 'hero')}<h1>¡Hola!</h1><p class="sub" style="margin:0">${L('Who is learning Spanish?', 'Кто учит испанский?')}</p></div>`;
+  b.innerHTML = `<div class="btnbar"><button class="lemon" onclick="pickName('amiga')">Soy amiga</button><button class="soft" style="flex:1" onclick="pickName('amigo')">Soy amigo</button></div>`;
+}
+function pickLang(l) { D.set.lang = l; save(); render(); }
+function pickName(n) { D.set.name = n; installExamples(); save(); render(); }
+function installExamples() {
+  if (D.ex || !EXAMPLES) return; D.ex = true;
+  for (const g of EXAMPLES) { if (nameTaken(g.name)) continue; const list = { id: uid(), name: g.name, c: Date.now(), m: [] }; D.lists.push(list); for (const w of g.words) addWord(list, w.es, withThe(w.es, w.en), w.ru); }
+}
+
+/* =================== MEMORIZE =================== */
+let S = null, tickTimer = null;
+const greetings = () => { const a = D.set.name === 'amigo' ? 'amigo' : 'amiga'; return [['¡Hola ' + a + '!', L('Ready to practise?', 'Готовы заниматься?')], ['¡Buenas, ' + a + '!', L('A few cards today?', 'Пару карточек сегодня?')], ['¡Vamos, ' + a + '!', L('Let\'s learn something new', 'Выучим что-то новое')]]; };
+let greet = null;
+SCREENS.home = (m, b) => {
+  greet = greet || greetings()[Math.floor(Math.random() * 3)];
+  m.innerHTML = `<div class="homewrap"><h1>${esc(greet[0])}</h1><p class="sub" style="margin:0">${esc(greet[1])}</p>${art('hello', 'hero')}</div>`;
+  bar(`<button class="lemon" onclick="go('practice')">${L('Memorize', 'Учить')}</button>`);
+};
+SCREENS.practice = (m, b) => {
+  m.innerHTML = `${backLink()}<h1>${L('Memorize', 'Учить')}</h1><p class="sub">${L('What do you want to practise?', 'Что хотите повторить?')}</p>
+    <div class="card row" onclick="go('pick',{})"><div><b>${L('Words', 'Слова')}</b><small>${L('Flashcards from your lists', 'Карточки из ваших списков')}</small></div><span class="chev">›</span></div>
+    <div class="card row" onclick="go('verbs')"><div><b>${L('Verbs', 'Глаголы')}</b><small>${L('Present tense levels and review', 'Уровни и повторение')}</small></div><span class="chev">›</span></div>`;
+};
+SCREENS.pick = (m, b, p) => {
+  const lists = D.lists.filter(l => activeM(l).length || true); let sel = pickSel();
+  m.innerHTML = `${backLink()}<div class="top"><h1>${L('Choose lists', 'Выберите списки')}</h1><button class="x" style="font-size:16px;font-weight:700" onclick="selAll()">${sel.size === lists.length && lists.length ? L('Clear', 'Снять все') : L('Select all', 'Выбрать все')}</button></div>` +
+    (lists.length ? lists.map(l => `<div class="card row ${sel.has(l.id) ? 'sel' : ''}" onclick="togglePick('${l.id}')"><div><b>${esc(l.name)}</b><small>${wordCount(activeM(l).length)}</small></div><span class="chev">${sel.has(l.id) ? '☑' : '☐'}</span></div>`).join('') :
+      `<div class="center">${art('nolists', 'hero')}<p class="sub">${L('No lists yet', 'Пока нет списков')}</p></div>`);
+  const chosen = lists.filter(l => sel.has(l.id)), seen = new Set(); let n = 0; chosen.forEach(l => activeWords(l).forEach(w => { if (!seen.has(w)) { seen.add(w); n++; } }));
+  b.innerHTML = `<div class="btnbar"><button class="primary" ${chosen.length ? '' : 'disabled'} onclick="startMemorize(false)">${chosen.length > 1 ? L(`Start with ${chosen.length} lists`, `Начать: ${chosen.length} ${plural(chosen.length, 'список', 'списка', 'списков')}`) + ' · ' + wordCount(n) : L('Start memorizing', 'Начать')}</button></div>`;
+};
+let _sel = null;
+function pickSel() { if (_sel) return _sel; const ids = new Set(D.lists.map(l => l.id)), rem = new Set((D.set.chosen || []).filter(i => ids.has(i))); _sel = rem.size ? rem : new Set(D.lists.length ? [D.lists[0].id] : []); return _sel; }
+function togglePick(id) { const s = pickSel(); s.has(id) ? s.delete(id) : s.add(id); const y = $('#main').scrollTop; render(); $('#main').scrollTop = y; }
+function selAll() { const s = pickSel(); if (s.size === D.lists.length) s.clear(); else D.lists.forEach(l => s.add(l.id)); render(); }
+function startMemorize(anyway) {
+  const sel = pickSel(), chosen = D.lists.filter(l => sel.has(l.id)); D.set.chosen = [...sel]; save();
+  const seen = new Set(), pool = []; chosen.forEach(l => activeWords(l).forEach(w => { if (!seen.has(w)) { seen.add(w); pool.push(w); } }));
+  if (!pool.length) { toast(L('These lists have no words', 'В этих списках нет слов')); return; }
+  wakeUp(pool); const ready = pool.filter(w => !resting(w)); save();
+  if (!ready.length && !anyway) { go('resting'); return; }
+  const words = anyway ? pool : ready;
+  const kinds = D.set.kinds.length ? D.set.kinds : ['es', 'en', 'type'];
+  S = { cards: buildSession(words, D.set.size || 20, kinds), i: 0, out: [], undo: [], sec: 0, last: Date.now(), shown: false, res: null, typed: '', done: false };
+  startTicker(); go('session');
+}
+function startTicker() { clearInterval(tickTimer); tickTimer = setInterval(() => { if (S && !S.done && Date.now() - S.last < 60000) { S.sec++; S.pend = (S.pend || 0) + 1; } }, 1000); }
+function flushTime() { if (S && S.pend) { dayStat().s += S.pend; S.pend = 0; save(); } }
+SCREENS.resting = (m, b) => {
+  m.innerHTML = `<div class="homewrap">${art('sleepy', 'hero')}<h1 style="font-size:28px">Tus palabras están descansando</h1><p class="sub" style="margin:0">Ya las conoces bien. Vuelve mañana o practica igualmente.</p></div>`;
+  b.innerHTML = `<div class="btnbar" style="flex-direction:column"><button class="soft" onclick="back();back()">Elegir otra lista</button><button class="soft" onclick="back();startMemorize(true)">Practicar igualmente</button></div>`;
+};
+const capText = k => k === 'es' ? L('Spanish → English', 'Испанский → Русский') : k === 'en' ? L('English → Spanish', 'Русский → Испанский') : L('Type it in Spanish', 'Напишите по-испански');
+SCREENS.session = (m, b) => {
+  if (!S) return resetTo('home');
+  if (S.done) return sessionDone(m, b);
+  const c = S.cards[S.i], w = c.w, typing = c.kind === 'type', flipped = S.shown || S.res != null;
+  let front, back;
+  if (c.kind === 'es') { front = `<div class="big ${flipped ? 'dark' : ''}">${spHtml(w.es)}</div>`; back = flipped ? `<hr><div class="en">${esc(meaningOf(w))}</div>` : ''; }
+  else { front = `<div class="big">${esc(meaningOf(w))}</div>`; back = flipped ? `<hr><div class="big dark">${spHtml(w.es)}</div>` : ''; }
+  let fb = '';
+  if (S.res) { const r = S.res; fb = `<div class="fb ${r === 'correct' ? 'ok' : isGood(r) ? 'meh' : 'no'}">${r === 'correct' ? L('Correct', 'Верно') : r === 'accent' ? L('Almost! Check the accent', 'Почти! Проверьте ударение') : r === 'article' ? L('Almost! Check the article', 'Почти! Проверьте артикль') : L('Not quite', 'Не совсем')}</div>${S.res === 'wrong' || S.typedShow ? `<div class="hintx" style="margin-top:6px">${L('You typed ', 'Вы ввели ')}${esc(S.typed)}</div>` : ''}`; }
+  m.innerHTML = `<div class="top"><button class="x" onclick="endSession()">✕</button><p class="prog">${S.i + 1} / ${S.cards.length}</p></div><div class="bar"><i style="width:${S.i / S.cards.length * 100}%"></i></div>
+    <div class="flash" id="flash" ${!typing && !flipped ? 'onclick="showAns()"' : ''}>${art('peek-happy', 'peek')}<div class="cap">${capText(c.kind)}</div><div>${front}${back}${fb}</div>
+    ${!typing && !flipped ? `<div class="hint">${L('Swipe right or tap to show the answer', 'Свайп вправо или нажмите, чтобы увидеть ответ')}</div>` : ''}</div>` +
+    (typing && !S.res ? `<input class="f" id="ans" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">` : '');
+  const undo = S.undo.length ? `<button class="soft" onclick="redoLast()">↶</button>` : '';
+  if (typing && !S.res) { b.innerHTML = `<div class="btnbar">${undo}<button class="primary" onclick="checkTypedCard()">${L('Check', 'Проверить')}</button></div>`; setTimeout(() => { const a = $('#ans'); if (a) { a.focus(); a.onkeydown = e => e.key === 'Enter' && checkTypedCard(); } }, 0); }
+  else if (typing) b.innerHTML = `<div class="btnbar">${undo}<button class="primary" onclick="nextCard()">${L('Next', 'Дальше')}</button></div>`;
+  else if (!flipped) b.innerHTML = `<div class="btnbar">${undo}<button class="lemon" onclick="showAns()">${L('Show answer', 'Показать ответ')}</button></div>`;
+  else b.innerHTML = `<div class="btnbar">${undo}<button class="bad" onclick="judge(false)">${L('Wrong', 'Неверно')}</button><button class="good" onclick="judge(true)">${L('Correct', 'Верно')}</button></div>`;
   let x0 = null; const f = $('#flash');
-  f.ontouchstart = e => x0 = e.touches[0].clientX;
-  f.ontouchend = e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (dx > 60) reveal(); else if (dx < -60) redo(); };
+  f.ontouchstart = e => x0 = e.touches[0].clientX; f.ontouchend = e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (dx > 60 && !typing) showAns(); else if (dx < -60) redoLast(); };
+};
+function showAns() { if (!S.shown) { S.shown = true; S.last = Date.now(); render(); } }
+function record(c, ok, extra) {
+  const w = c.w, snap = { w, r: w.r, rest: w.rest, ok, c, wasDone: false };
+  applyAnswer(w, ok); const d = dayStat(); d.a++; if (ok) d.c++; d.s += S.pend || 0; S.pend = 0; S.last = Date.now();
+  S.out.push({ w, ok, kind: c.kind }); S.undo.push(snap); save(); buzz(ok);
 }
-function reveal() { if (!session.shown) { session.shown = true; render(); } }
-function redo() { if (session.i > 0) { session.i--; session.shown = false; session.result = null; render(); } }
-function check() {
-  const w = session.cards[session.i], a = norm(($('#ans') || {}).value || '');
-  const right = (lang === 'ru' ? w.ru : w.en).split(/[,/;]/).concat(lang === 'en' ? [meaning(w)] : []).map(norm).map(x => x.replace(/^(the|to) /, ''));
-  session.result = right.includes(a.replace(/^(the|to) /, '')); session.shown = true; render();
+function judge(ok) { record(S.cards[S.i], ok); S.i++; S.shown = false; S.res = null; S.typed = ''; if (S.i >= S.cards.length) finishSession(); render(); }
+function checkTypedCard() {
+  const c = S.cards[S.i], a = ($('#ans') || {}).value || ''; if (!a.trim()) return;
+  S.typed = a; S.res = checkTyped(a, c.w.es, D.set.checkArt); record(c, isGood(S.res));
+  render();
 }
-function bump(ok) { if (stats.day !== today()) stats = { day: today(), answered: 0, correct: 0 }; stats.answered++; if (ok) stats.correct++; store.set('stats', stats); }
-function answer(ok) {
-  const w = session.cards[session.i], k = key(w.es);
-  ratings[k] = Math.max(0, (ratings[k] || 0) + (ok ? 1 : -1)); store.set('ratings', ratings); bump(ok); if (ok) session.ok++;
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(ok ? 'success' : 'warning');
-  session.i++; session.shown = false; session.result = null; render();
+function nextCard() { S.i++; S.shown = false; S.res = null; S.typed = ''; if (S.i >= S.cards.length) finishSession(); render(); }
+function redoLast() {
+  if (!S.undo.length) return; const u = S.undo.pop(); S.out.pop();
+  u.w.r = u.r; u.w.rest = u.rest; const d = dayStat(); d.a = Math.max(0, d.a - 1); if (u.ok) d.c = Math.max(0, d.c - 1);
+  if (S.done) { S.done = false; } else if (S.res == null) { S.i = Math.max(0, S.i - 1); }
+  S.i = Math.min(S.i, S.cards.length - 1); S.shown = false; S.res = null; S.typed = ''; save(); render();
 }
-
-/* ---------- lists ---------- */
-function listsView(m, b) {
-  const sec = (title, arr, off) => arr.length ? `<p class="sub" style="margin-top:14px">${title}</p>` + arr.map((l, i) => `<div class="card row" onclick="openList(${i + off})"><div><b>${esc(l.name)}</b><small>${l.words.length} ${t('words')}</small></div><span class="chev">›</span></div>`).join('') : '';
-  m.innerHTML = `<h1>${t('Lists')}</h1>` + sec(t('My lists'), custom, base.length) + sec(t('Example lists'), base, 0);
-  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="newList()">${t('Create list')}</button></div>`;
-}
-function newList() { const n = (prompt(t('List name')) || '').trim(); if (!n) return; custom.push({ name: n, words: [] }); store.set('custom', custom); openList(base.length + custom.length - 1); }
-function openList(i) { view = i; q = ''; render(); }
-function listView(m, b) {
-  const l = all()[view], mine = view >= base.length;
-  m.innerHTML = `<span class="back" onclick="view=null;render()">${t('‹ Back')}</span><h1 style="font-size:30px">${esc(l.name)}</h1><p class="sub">${l.words.length} ${t('words')}</p>
-    <input type="search" placeholder="${t('Search')}" oninput="q=this.value;words()"><div id="words"></div>`; words();
-  b.innerHTML = mine ? `<div class="btnbar"><button class="soft" onclick="delList()">🗑</button><button class="primary" onclick="addWord()">${t('Add word')}</button></div>` : '';
-}
-function delList() { if (confirm(t('Delete this list?'))) { custom.splice(view - base.length, 1); store.set('custom', custom); view = null; render(); } }
-function addWord() {
-  const es = (prompt(t('Spanish')) || '').trim(); if (!es) return; const m = (prompt(t('Meaning')) || '').trim(); if (!m) return;
-  custom[view - base.length].words.push(lang === 'ru' ? { es, en: m, ru: m } : { es, en: m.replace(/^the /i, ''), ru: m }); store.set('custom', custom); render();
-}
-function words() {
-  const l = all()[view], tt = q.toLowerCase();
-  $('#words').innerHTML = [...l.words].filter(w => !tt || w.es.toLowerCase().includes(tt) || meaning(w).toLowerCase().includes(tt))
-    .sort((a, b) => key(a.es).localeCompare(key(b.es), 'es')).map(w => { const r = rate(w.es);
-      return `<div class="card word"><div><span class="es">${spanishHtml(w.es)}</span><small>${esc(meaning(w))}</small></div><span class="pill ${r==0?'z':r>=5?'hi':''}">${r}</span></div>`; }).join('') || `<p class="sub center">${t('No words yet')}</p>`;
+function finishSession() { flushTime(); S.done = true; buzz(true); save(); }
+function endSession() { if (S.out.length) finishSession(); else { flushTime(); S = null; } back(); }
+function sessionDone(m, b) {
+  const out = S.out, correct = out.filter(o => o.ok).length, good = !out.length || correct / out.length >= .5;
+  const seen = [], map = new Map(); out.forEach(o => { if (map.has(o.w)) map.set(o.w, map.get(o.w) && o.ok); else { map.set(o.w, o.ok); seen.push(o.w); } });
+  m.innerHTML = `<h1 class="center" style="color:var(--khakiT)">${L('Session done', 'Готово')}</h1><div class="center">${art(good ? 'face-stars' : 'face-tongue', 'hero')}</div>
+    <h1 class="center" style="color:var(--khakiT);font-size:30px">${good ? '¡Muy bien!' : '¡Ánimo!'}</h1><p class="sub center">${L(`${correct} of ${out.length} right`, `${correct} из ${out.length} верно`)} · ${S.sec < 60 ? L('under 1 min', 'меньше минуты') : formatDuration(S.sec)}</p>` +
+    seen.map(w => `<div class="card word" style="cursor:default"><div><span class="es">${spHtml(w.es)}</span><small>${esc(meaningOf(w))}</small></div><span class="pill ${map.get(w) ? '' : 'z'}">${map.get(w) ? '✓' : '✕'}</span></div>`).join('');
+  b.innerHTML = `<div class="btnbar"><button class="soft" onclick="redoLast()">↶</button><button class="khaki" onclick="S=null;resetTo('pick',{})">${L('Memorize again', 'Ещё раз')}</button></div>`;
 }
 
-/* ---------- verbs ---------- */
-const unlocked = i => i === 1 || vpass.includes(i - 1);
-function verbsHome(m, b) {
-  m.innerHTML = `<h1>${t('Verbs')}</h1><p class="sub">${t('Present tense')} · ${vpass.length} ${t('of')} 12 ${t('levels done')}</p>` +
-    LEVELS.map((_, k) => { const i = k + 1, vs = lvVerbs(i); return `<div class="card row ${unlocked(i)?'':'lock'}" onclick="openLevel(${i})"><div style="display:flex;align-items:center"><span class="num ${vpass.includes(i)?'done':''}">${vpass.includes(i)?'✓':i}</span><div><b>${esc(lvTitle(i))}</b><small>${vs.slice(0,3).map(v=>v.i).join(', ')}${vs.length>3?'…':''}</small></div></div><span class="chev">${unlocked(i)?'›':'🔒'}</span></div>`; }).join('');
-  b.innerHTML = `<div class="btnbar"><button class="lemon" onclick="practice()">${t('Practice')}</button></div>`;
+/* =================== LISTS =================== */
+const KIND_LABELS = { es: 'ES → EN', en: 'EN → ES', type: L('Typing', 'Ввод') };
+SCREENS.lists = (m, b) => {
+  const arch = archivedRows().length;
+  m.innerHTML = `<h1>${L('Lists', 'Списки')}</h1>
+    <p class="sub" style="margin-bottom:6px">${L('Cards per session', 'Карточек за раз')}</p><div class="seg">${[10, 20, 30, 50].map(n => `<button class="${D.set.size === n ? 'on' : ''}" onclick="D.set.size=${n};save();render()">${n}</button>`).join('')}</div>
+    <p class="sub" style="margin-bottom:6px">${L('Card types', 'Типы карточек')}</p><div class="seg">${['es', 'en', 'type'].map(k => `<button class="${D.set.kinds.includes(k) ? 'on' : ''}" onclick="toggleKind('${k}')">${D.set.kinds.includes(k) ? '✓ ' : ''}${k === 'type' ? L('Typing', 'Ввод') : KIND_LABELS[k]}</button>`).join('')}</div>
+    <div class="card row" onclick="D.set.checkArt=!D.set.checkArt;save();render()"><div><b>${L('Check articles', 'Проверять артикли')}</b><small>${D.set.checkArt ? L('On', 'Вкл') : L('Off', 'Выкл')}</small></div><span class="switch ${D.set.checkArt ? 'on' : ''}"></span></div>` +
+    (D.lists.length ? D.lists.map(l => `<div class="card row" onclick="go('list',{id:'${l.id}'})"><div><b>${esc(l.name)}</b><small>${wordCount(activeM(l).length)}</small></div><span class="chev">›</span></div>`).join('') :
+      `<div class="center">${art('nolists', 'hero')}<h1 style="font-size:24px">${L('No lists yet', 'Пока нет списков')}</h1><p class="sub">${L('Make your first list, or import one a friend shared.', 'Создайте список или импортируйте от друга.')}</p></div>`) +
+    `<div class="card row" onclick="go('archived')"><div><b>${L('Archived', 'Архив')}</b><small>${arch ? wordCount(arch) : L('nothing archived', 'в архиве пусто')}</small></div><span class="chev">›</span></div>`;
+  b.innerHTML = `<div class="btnbar"><button class="soft" onclick="importSheet()">${L('Import', 'Импорт')}</button><button class="primary" onclick="listNameSheet('',L('Create','Создать'),n=>{const l={id:uid(),name:n,c:Date.now(),m:[]};D.lists.push(l);save();go('list',{id:l.id})})">${L('Create list', 'Создать список')}</button></div>`;
+};
+function toggleKind(k) { const a = D.set.kinds; if (a.includes(k)) { if (a.length > 1) a.splice(a.indexOf(k), 1); else toast(L('Pick at least one card type', 'Выберите хотя бы один тип')); } else a.push(k); save(); render(); }
+function listNameSheet(initial, action, fn, except) {
+  window._nm = () => { const n = $('#lname').value.trim(); if (!n) return; if (nameTaken(n, except)) { $('#lerr').textContent = L('You already have a list with this name', 'Список с таким названием уже есть'); return; } closeSheet(); fn(n); };
+  openSheet(`<h2>${L('List name', 'Название списка')}</h2><input type="text" id="lname" value="${esc(initial)}" placeholder="${L('Animals', 'Животные')}" autocomplete="off"><p class="warn" id="lerr"></p><div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button><button class="primary" onclick="_nm()">${action}</button></div>`);
+  setTimeout(() => { const i = $('#lname'); i && i.focus(); }, 50);
 }
-function openLevel(i) { if (unlocked(i)) { view = i; render(); } }
-function verbLearn(m, b) {
-  const i = view, vs = lvVerbs(i);
-  m.innerHTML = `<span class="back" onclick="view=null;render()">${t('‹ Back')}</span><h1 style="font-size:30px">${esc(lvTitle(i))}</h1><div class="card rule">${esc(lvRule(i))}</div>` +
-    vs.map(v => { const f = conjugate(v), r = regularForms(v); return `<div class="card"><b style="font-size:20px">${esc(v.i)}</b><span class="tag">${esc(vMean(v))}</span><table>${f.map((x, p) => x == null ? '' : `<tr><td>${PERSONS[p]}</td><td><b class="${x !== r[p] ? 'irr' : ''}">${esc(x)}</b></td></tr>`).join('')}</table></div>`; }).join('');
-  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="startQuiz(${i})">${t('Start quiz')}</button></div>`;
+SCREENS.list = (m, b, p) => {
+  const l = listById(p.id); if (!l) return resetTo('lists');
+  const q = (p.q || '').trim().toLowerCase();
+  const words = activeWords(l).filter(w => !q || w.es.toLowerCase().includes(q) || meaningOf(w).toLowerCase().includes(q)).sort((a, c) => a.r !== c.r ? a.r - c.r : wk(a.es).localeCompare(wk(c.es), 'es'));
+  m.innerHTML = `${backLink()}<div class="top"><h1 style="font-size:28px">${esc(l.name)}</h1><div class="pillrow" style="margin:0;flex-wrap:nowrap"><button class="soft" onclick="renameList('${l.id}')">${L('Rename', 'Имя')}</button><button class="soft" onclick="exportSheet('${l.id}')">⇪</button></div></div>
+    <p class="sub">${wordCount(activeM(l).length)}</p><input type="search" id="lsearch" placeholder="${L('Search', 'Поиск')}" value="${esc(p.q || '')}" oninput="cur().p.q=this.value;listRows()">
+    <div id="rows"></div><button class="linkbtn" onclick="delListAsk('${l.id}')">${L('Delete list', 'Удалить список')}</button>`;
+  listRows();
+  bar(`<button class="primary" onclick="wordSheet('${l.id}')">${L('Add word', 'Добавить слово')}</button><button class="soft" style="flex:1" onclick="addManySheet('${l.id}')">${L('Many words', 'Много слов')}</button>`);
+};
+function listRows() {
+  const p = cur().p, l = listById(p.id), q = (p.q || '').trim().toLowerCase();
+  const words = activeWords(l).filter(w => !q || w.es.toLowerCase().includes(q) || meaningOf(w).toLowerCase().includes(q)).sort((a, c) => a.r !== c.r ? a.r - c.r : wk(a.es).localeCompare(wk(c.es), 'es'));
+  $('#rows').innerHTML = words.length ? words.map(w => { const also = otherLists(w, l); return `<div class="card word" onclick="wordSheet('${l.id}','${wk(w.es).replace(/'/g, "\\'")}')"><div><span class="es">${spHtml(w.es)}</span><small>${esc(meaningOf(w))}${also.length ? ' · ' + L('also in', 'ещё в') + ' ' + esc(also.join(', ')) : ''}</small></div><span class="pill ${w.r === 0 ? 'z' : w.r >= 5 ? 'hi' : ''}">${w.r}</span></div>`; }).join('') : `<p class="sub center" style="margin-top:30px;font-size:20px;font-weight:600;color:var(--deep)">${L('no words yet', 'пока нет слов')}</p>`;
 }
-function makeCards(pool, n) {
-  const cards = [];
-  for (const v of pool) { const f = conjugate(v); f.forEach((x, p) => x != null && cards.push({ v, p, ans: x })); }
-  return cards.sort(() => Math.random() - .5).slice(0, n);
+function renameList(id) { const l = listById(id); listNameSheet(l.name, L('Save', 'Сохранить'), n => { l.name = n; save(); render(); }, l); }
+function delListAsk(id) { const l = listById(id); confirmBox(L(`Delete “${l.name}”?`, `Удалить «${l.name}»?`), L(`Its ${wordCount(activeM(l).length)} move to Archived with their progress`, `${wordCount(activeM(l).length)} уйдут в архив вместе с прогрессом`), L('Delete', 'Удалить'), () => { deleteList(l); save(); resetTo('lists'); }); }
+function wordSheet(listId, key) {
+  const l = listById(listId), w = key ? D.words[key] : null;
+  window._ws = (again) => {
+    const es = $('#wes').value.trim(), mn = $('#wen').value.trim(); if (!es || !mn) return;
+    if (l.containsKey) {} const k = wk(es);
+    if (l.m.some(x => x.k === k && !x.a && (!w || x.k !== wk(w.es)))) { $('#werr').textContent = L('This word is already in the list', 'Это слово уже в списке'); return; }
+    if (w) { const oldK = wk(w.es); w.es = es; if (lang() === 'ru') w.ru = mn; else w.en = mn; if (D.set.lang && !(lang() === 'ru' ? w.en : w.ru)) { w.en = w.en || mn; w.ru = w.ru || mn; } if (k !== oldK) { D.words[k] = w; delete D.words[oldK]; D.lists.forEach(x => x.m.forEach(mm => { if (mm.k === oldK) mm.k = k; })); D.orphans.forEach(o => { if (o.k === oldK) o.k = k; }); Object.keys(D.words); } save(); closeSheet(); render(); return; }
+    const nw = addWord(l, es, lang() === 'ru' ? '' : mn, lang() === 'ru' ? mn : ''); if (lang() === 'ru') nw.en = nw.en || mn; else nw.ru = nw.ru || mn;
+    save(); if (again) { $('#wes').value = ''; $('#wen').value = ''; $('#wes').focus(); toast(L('Added', 'Добавлено')); render(); } else { closeSheet(); render(); }
+  };
+  window._wa = () => { archiveWord(l, wk(w.es)); save(); closeSheet(); render(); const t = document.createElement('div'); t.className = 'undo'; t.innerHTML = L('Undo archive', 'Вернуть из архива'); t.onclick = () => { const m = l.m.find(x => x.k === wk(w.es)); if (m) m.a = 0; save(); t.remove(); render(); }; document.body.appendChild(t); setTimeout(() => t.remove(), 4000); };
+  openSheet(`<h2>${w ? L('Edit word', 'Изменить слово') : L('Add word', 'Добавить слово')}</h2><input type="text" id="wes" placeholder="${L('Spanish, like el perro', 'По-испански, например el perro')}" value="${esc(w ? w.es : '')}" autocomplete="off" autocapitalize="off"><input type="text" id="wen" placeholder="${L('Meaning, like the dog', 'Значение')}" value="${esc(w ? meaningOf(w) : '')}" autocomplete="off"><p class="warn" id="werr"></p>
+    <div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>${w ? `<button class="soft" onclick="_wa()">${L('Archive', 'В архив')}</button>` : `<button class="soft" onclick="_ws(true)">${L('Add another', 'Ещё')}</button>`}<button class="primary" onclick="_ws(false)">${L('Save', 'Сохранить')}</button></div>`);
+  setTimeout(() => { const i = $('#wes'); i && !w && i.focus(); }, 60);
 }
-function startQuiz(level) { vq = { level, cards: makeCards(lvVerbs(level), 10), i: 0, ok: 0, result: null, shown: false, done: false }; render(); }
-function practice() { const levels = [...new Set([1, ...vpass])].filter(unlocked); const pool = verbs.filter(v => levels.includes(v.l)); vq = { level: 0, cards: makeCards(pool, 10), i: 0, ok: 0, result: null, shown: false, done: false }; render(); }
-function vquizCard(m, b) {
-  const s = vq, c = s.cards[s.i];
-  m.innerHTML = `<p class="prog">${s.i+1} / ${s.cards.length}</p><div class="bar"><i style="width:${s.i/s.cards.length*100}%"></i></div>
-    <div class="flash" style="height:40vh">${art('peek-happy','peek')}<div><div class="es">${esc(c.v.i)}</div><div class="en">${esc(vMean(c.v))}</div><div style="margin-top:18px;font-size:24px;font-weight:700">${PERSONS_CARD[c.p]}</div>
-    ${s.result == null ? '' : `<div class="fb ${s.result?'ok':'no'}">${s.result ? t('Right!') : esc(c.ans)}</div>`}</div></div>` +
-    (s.shown ? '' : `<input class="f" id="ans" placeholder="${t('Type the form')}" autocomplete="off" autocapitalize="off">`);
-  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="${s.shown ? 'vnext()' : 'vcheck()'}">${s.shown ? t('Next') : t('Check')}</button></div>`;
-  if (!s.shown) setTimeout(() => { const a = $('#ans'); if (a) { a.focus(); a.addEventListener('keydown', e => e.key === 'Enter' && vcheck()); } }, 0);
+const SEPS = ['\t', ' - ', ' – ', ' — ', '=', ';', ','];
+function parseWords(text) {
+  const out = [];
+  for (const raw of text.split(/\r?\n/)) { const line = raw.trim(); if (!line || line.startsWith('#')) continue; for (const sp of SEPS) { const i = line.indexOf(sp); if (i > 0) { const es = line.slice(0, i).trim(), m = line.slice(i + sp.length).trim(); if (es && m) out.push({ es, en: m, ru: m }); break; } } }
+  return out;
 }
-function vcheck() { const s = vq, c = s.cards[s.i], a = (($('#ans') || {}).value || '').trim().toLowerCase(); s.result = a === c.ans.toLowerCase(); if (s.result) s.ok++; s.shown = true; bump(s.result); if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(s.result ? 'success' : 'warning'); render(); }
-function vnext() { const s = vq; s.i++; s.shown = false; s.result = null; if (s.i >= s.cards.length) s.done = true; render(); }
+function parseAny(text) {
+  const tx = text.trim();
+  try { const j = JSON.parse(tx); if (j && Array.isArray(j.words)) return { name: j.name || '', words: j.words.map(w => ({ es: w.spanish || w.es, en: w.english || w.en, ru: w.english || w.ru || w.en })).filter(w => w.es && w.en) }; } catch {}
+  const h = tx.match(/^#\s*(.+)$/m); return { name: h ? h[1].trim() : '', words: parseWords(tx) };
+}
+function mergeWords(list, words) { let added = 0, there = 0; for (const w of words) { const k = wk(w.es), had = list.m.some(x => x.k === k && !x.a); if (had) { there++; continue; } addWord(list, w.es, w.en, w.ru); added++; } return { added, there }; }
+function addManySheet(id) {
+  window._am = () => { const l = listById(id), r = mergeWords(l, parseWords($('#bulk').value)); save(); closeSheet(); render(); toast(L(`${wordCount(r.added)} added`, `Добавлено: ${wordCount(r.added)}`) + (r.there ? ` · ${r.there} ${L('already there', 'уже были')}` : '')); };
+  openSheet(`<h2>${L('Add many', 'Много слов')}</h2><p class="hintx">${L('One word per line: Spanish, meaning', 'По одному слову в строке: испанский, значение')}</p><textarea id="bulk" placeholder="el perro, dog&#10;el gato, cat&#10;comer, to eat"></textarea><div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button><button class="primary" onclick="_am()">${L('Add', 'Добавить')}</button></div>`);
+}
+SCREENS.archived = (m, b) => {
+  const rows = archivedRows(); const q = (cur().p.q || '').toLowerCase();
+  const list = rows.filter(r => { const w = D.words[r.k]; return !q || w.es.toLowerCase().includes(q) || meaningOf(w).toLowerCase().includes(q); }).sort((a, c) => wk(D.words[a.k].es).localeCompare(wk(D.words[c.k].es), 'es'));
+  m.innerHTML = `${backLink()}<h1>${L('Archived', 'Архив')}</h1><p class="sub">${wordCount(rows.length)}</p><input type="search" placeholder="${L('Search', 'Поиск')}" value="${esc(cur().p.q || '')}" oninput="cur().p.q=this.value;render()">` +
+    (rows.length ? list.map((r, i) => { const w = D.words[r.k]; return `<div class="card"><div class="irow"><div><span style="font-size:19px;font-weight:600">${spHtml(w.es)}</span><small style="display:block;color:var(--muted)">${esc(meaningOf(w))} · ${esc(r.label)}</small></div><span class="pill ${w.r === 0 ? 'z' : w.r >= 5 ? 'hi' : ''}">${w.r}</span></div><div class="pillrow" style="margin:10px 0 0"><button class="soft" onclick="unarch(${rows.indexOf(r)})">${L('Unarchive', 'Вернуть')}</button><button class="bad" style="flex:none" onclick="delArch(${rows.indexOf(r)})">${L('Delete', 'Удалить')}</button></div></div>`; }).join('') : `<p class="sub center" style="margin-top:30px;font-size:20px;font-weight:600;color:var(--deep)">${L('nothing archived', 'в архиве пусто')}</p>`);
+};
+function unarch(i) { unarchive(archivedRows()[i]); save(); render(); }
+function delArch(i) { const r = archivedRows()[i], w = D.words[r.k]; confirmBox(L(`Delete “${w.es}” for good?`, `Удалить «${w.es}» навсегда?`), L("It can't be brought back", 'Вернуть не получится'), L('Delete', 'Удалить'), () => { deleteForever(r); save(); render(); }); }
+
+/* ---- export / import ---- */
+function listText(l) { return `# ${l.name}\n` + activeWords(l).map(w => `${w.es} - ${meaningOf(w)}`).join('\n'); }
+function exportSheet(id) {
+  const l = listById(id); window._exp = { l, txt: listText(l) };
+  openSheet(`<h2>${L('Export list', 'Поделиться списком')}</h2><p class="hintx">${wordCount(activeM(l).length)} · ${L('Words only, no ratings', 'Только слова, без оценок')}</p><textarea id="exp" readonly>${esc(_exp.txt)}</textarea>
+    <div class="acts"><button class="soft" onclick="copyExp()">${L('Copy', 'Копировать')}</button><button class="soft" onclick="saveExp()">${L('Save file', 'Файл')}</button><button class="primary" onclick="shareExp()">${L('Share', 'Поделиться')}</button></div><button class="linkbtn" style="color:var(--deep)" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>`);
+}
+function copyExp() { const el = $('#exp'); el.select(); try { navigator.clipboard.writeText(el.value); } catch { document.execCommand('copy'); } toast(L('Copied', 'Скопировано')); }
+function shareExp() { const url = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/memoChiAppBot/memoChi') + '&text=' + encodeURIComponent($('#exp').value); try { tg.openTelegramLink(url); } catch { window.open(url, '_blank'); } }
+function saveExp() { const l = _exp.l, file = { app: 'memo', version: 1, name: l.name, words: activeWords(l).map(w => ({ spanish: w.es, english: meaningOf(w) })) }; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(file, null, 1)], { type: 'application/json' })); a.download = l.name.replace(/[\/:?*"<>|]/g, '') + '.memo'; document.body.appendChild(a); a.click(); a.remove(); }
+function importSheet() {
+  openSheet(`<h2>${L('Import', 'Импорт')}</h2><p class="hintx">${L('Paste a list or choose a .memo file', 'Вставьте список или выберите файл .memo')}</p><textarea id="itext" placeholder="el perro, dog&#10;el gato, cat"></textarea>
+    <input type="file" id="ifile" accept=".memo,.json,.txt,text/plain,application/json" style="display:none" onchange="readFile(this)">
+    <div class="acts"><button class="soft" onclick="$('#ifile').click()">${L('Choose file', 'Файл')}</button><button class="primary" onclick="doImport()">${L('Import', 'Импорт')}</button></div><button class="linkbtn" style="color:var(--deep)" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>`);
+}
+function readFile(inp) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { $('#itext').value = r.result; }; r.readAsText(f); }
+function doImport() {
+  const p = parseAny($('#itext').value); if (!p.words.length) { toast(L("That doesn't have any words memo can read.", 'Не нашёл слов для импорта')); return; }
+  const name = p.name || L('Imported list', 'Импортированный список'), ex = D.lists.find(l => l.name.toLowerCase() === name.toLowerCase());
+  window._imp = p;
+  if (ex) { window._impEx = ex; openSheet(`<h2>${L(`You already have “${ex.name}”`, `Список «${ex.name}» уже есть`)}</h2><p class="hintx">${L(`The file has ${wordCount(p.words.length)}.`, `В файле ${wordCount(p.words.length)}.`)}</p><div class="acts" style="flex-direction:column"><button class="primary" onclick="impTo()">${L(`Add to my “${ex.name}”`, `Добавить в «${ex.name}»`)}</button><button class="soft" onclick="impRename()">${L('Rename imported list', 'Переименовать импорт')}</button><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button></div>`); return; }
+  impNew(name);
+}
+function impNew(name) { const l = { id: uid(), name, c: Date.now(), m: [] }; D.lists.push(l); mergeWords(l, _imp.words); save(); closeSheet(); go('list', { id: l.id }); }
+function impTo() { const r = mergeWords(_impEx, _imp.words); save(); closeSheet(); render(); toast(L(`${wordCount(r.added)} added`, `Добавлено: ${wordCount(r.added)}`) + (r.there ? ` · ${r.there} ${L('already there', 'уже были')}` : '')); }
+function impRename() { listNameSheet((_imp.name || '') + ' 2', L('Import', 'Импорт'), n => impNew(n)); }
+
+/* =================== VERBS SCREENS =================== */
+const myItems = () => D.myverbs.map(e => verbItem(e.i, e.m, e.k, e.f));
+SCREENS.verbs = (m, b) => {
+  const inMem = false, cl = currentLevel(), allDone = D.vpass.length >= 12;
+  m.innerHTML = `${stacks[tab].length ? backLink() : ''}<h1>${L('Verbs', 'Глаголы')}</h1><p class="sub">${L(`Present tense · ${D.vpass.length} of 12 levels done`, `Настоящее время · пройдено ${D.vpass.length} из 12`)}</p>
+    <div class="card row" onclick="go('mine')"><div><b>${L('My verbs', 'Мои глаголы')}</b><small>${D.myverbs.length ? counted(D.myverbs.length, 'verb', 'verbs', 'глагол', 'глагола', 'глаголов') : L('Add your own verbs', 'Добавьте свои глаголы')}</small></div><span class="chev">›</span></div>
+    <div class="card row" onclick="go('vlists')"><div><b>${L('Verbs from my lists', 'Глаголы из моих списков')}</b><small>${L('Verbs in your word lists', 'Глаголы из ваших списков')}</small></div><span class="chev">›</span></div>` +
+    LEVELS.map((_, k) => { const n = k + 1, ok = vUnlocked(n); return `<div class="card row ${ok ? '' : 'lock'}" onclick="go('learn',{n:${n}})"><div style="display:flex;align-items:center"><span class="num ${D.vpass.includes(n) ? 'done' : ''}">${D.vpass.includes(n) ? '✓' : n}</span><div><b>${esc(lvTitle(n))}</b><small>${esc(lvExamples(n))}${D.vbest[n] ? ' · ' + D.vbest[n] + '%' : ''}</small></div></div><span class="chev">${ok ? '›' : '🔒'}</span></div>`; }).join('');
+  b.innerHTML = `<div class="btnbar"><button class="lemon" onclick="go('learn',{n:${cl}})">${L(`Continue · level ${cl}`, `Продолжить · уровень ${cl}`)}</button><button class="soft" style="flex:none" onclick="startQuiz('review')">${L('Review', 'Повтор')}</button></div>`;
+};
+function counted(n, e1, e2, r1, r2, r5) { return lang() === 'ru' ? `${n} ${plural(n, r1, r2, r5)}` : `${n} ${n === 1 ? e1 : e2}`; }
+SCREENS.learn = (m, b, p) => {
+  const n = p.n, vs = levelVerbs(n).map(catalogItem);
+  m.innerHTML = `${backLink()}<h1 style="font-size:28px">${L('Level', 'Уровень')} ${n} · ${esc(lvTitle(n))}</h1><div class="card rule">${esc(lvRule(n))}</div>` + vs.map(verbCard).join('');
+  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="startQuiz('level',${n})">${L('Start quiz', 'Начать тест')}</button></div>`;
+};
+function verbCard(it) {
+  const reg = regularForms(it.inf);
+  return `<div class="card"><b style="font-size:20px">${esc(it.inf)}</b><span class="tag">${esc(it.meaning)}</span> <span class="tag" style="background:#fff">${esc(it.label)}</span><table>${it.forms.map((x, i) => x == null ? '' : `<tr><td>${PERSONS[i]}</td><td><b class="${x !== reg[i] ? 'irr' : ''}">${esc(x)}</b></td></tr>`).join('')}</table></div>`;
+}
+SCREENS.mine = (m, b) => {
+  m.innerHTML = `${backLink()}<h1>${L('My verbs', 'Мои глаголы')}</h1><p class="sub">${D.myverbs.length ? counted(D.myverbs.length, 'verb', 'verbs', 'глагол', 'глагола', 'глаголов') : ''}</p>` +
+    (D.myverbs.length ? D.myverbs.map((e, i) => { const it = verbItem(e.i, e.m, e.k, e.f); return `<div class="card row" onclick="verbSheet(${i})"><div><b>${esc(it.inf)}</b><small>${esc(it.meaning)} · ${esc(it.label)}${it.guessed ? ' · <span class="warn">' + L('check type', 'проверьте тип') + '</span>' : ''}</small></div><span class="chev">›</span></div>`; }).join('') :
+      `<div class="center">${art('nolists', 'hero')}<p class="sub">${L('no verbs yet', 'пока нет глаголов')}</p></div>`);
+  b.innerHTML = `<div class="btnbar"><button class="soft" onclick="startQuiz('mine')" ${D.myverbs.length ? '' : 'disabled'}>${L('Practise', 'Тренировка')}</button><button class="primary" onclick="verbSheet(-1)">${L('Add verb', 'Добавить глагол')}</button></div>`;
+};
+let VS = null;
+function verbSheet(i) {
+  const e = i >= 0 ? D.myverbs[i] : null;
+  VS = { i, inf: e ? e.i : '', m: e ? e.m : '', k: e ? e.k : null, f: e ? e.f.slice() : Array(6).fill(''), list: '', also: false };
+  drawVerbSheet();
+}
+function drawVerbSheet() {
+  const v = VS, it = v.inf.trim() ? verbItem(v.inf, v.m, v.k, v.f) : null;
+  const types = [['', L('Auto', 'Авто')], ['regular', L('Regular', 'Правильный')], ['e-ie', 'e → ie'], ['o-ue', 'o → ue'], ['e-i', 'e → i'], ['u-ue', 'u → ue'], ['irregular', L('Irregular', 'Неправильный')]];
+  const dup = v.i < 0 && v.inf.trim() && D.myverbs.some(x => x.i === v.inf.trim().toLowerCase());
+  openSheet(`<h2>${v.i >= 0 ? L('Edit verb', 'Изменить глагол') : L('Add verb', 'Добавить глагол')}</h2>
+    <input type="text" id="vinf" placeholder="${L('Type the infinitive, like hablar, comer or vivir', 'Инфинитив: hablar, comer, vivir')}" value="${esc(v.inf)}" oninput="VS.inf=this.value" onchange="autoMeaning();drawVerbSheet()" autocapitalize="off" autocomplete="off">
+    ${dup ? `<p class="warn">${L('Already in My verbs', 'Уже в «Моих глаголах»')}</p>` : ''}
+    <input type="text" id="vmean" placeholder="${L('English, like to return', 'Значение, например вернуться')}" value="${esc(v.m)}" oninput="VS.m=this.value" autocomplete="off">
+    <div class="chips">${types.map(([k, lb]) => `<button class="${(v.k || '') === k ? 'on' : ''}" onclick="VS.k=${k ? `'${k}'` : 'null'};drawVerbSheet()">${lb}</button>`).join('')}</div>
+    ${it ? `<p class="hintx">${L('Tap a type and the table changes. Tap any form to fix it by hand.', 'Выберите тип — таблица изменится. Нажмите на форму, чтобы исправить.')} ${it.guessed ? `<span class="warn">${L('Type · please check (memo guessed regular)', 'Проверьте тип (memo решил: правильный)')}</span>` : ''}</p>
+    <div class="card"><table>${it.forms.map((x, p) => `<tr onclick="fixForm(${p})" style="cursor:pointer"><td>${PERSONS[p]}</td><td><b class="${v.f[p] ? 'irr' : ''}">${esc(x ?? '')}</b></td></tr>`).join('')}</table></div>` : ''}
+    <div class="card row" onclick="VS.also=!VS.also;drawVerbSheet()"><div><b>${L('Also add to a word list', 'Добавить в список слов')}</b><small>${L('for normal word cards', 'для обычных карточек')}</small></div><span class="switch ${v.also ? 'on' : ''}"></span></div>
+    ${v.also ? `<select onchange="VS.list=this.value"><option value="">${L('List', 'Список')}…</option>${D.lists.map(l => `<option value="${l.id}" ${v.list === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}</select>` : ''}
+    <div class="acts">${v.i >= 0 ? `<button class="bad" onclick="delVerb()">${L('Delete', 'Удалить')}</button>` : ''}<button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>${v.i < 0 ? `<button class="soft" onclick="saveVerb(true)">${L('Save and add another', 'Ещё')}</button>` : ''}<button class="primary" onclick="saveVerb(false)">${L('Save', 'Сохранить')}</button></div>`);
+}
+function autoMeaning() { const b = BYINF[VS.inf.trim().toLowerCase()]; if (b && !VS.m.trim()) VS.m = lang() === 'ru' ? b.ru : b.en; }
+function fixForm(p) { const it = verbItem(VS.inf, VS.m, VS.k, VS.f); const v = prompt(PERSONS[p], it.forms[p] || ''); if (v === null) return; VS.f[p] = v.trim() === (verbItem(VS.inf, VS.m, VS.k, Array(6).fill('')).forms[p] || '') ? '' : v.trim(); drawVerbSheet(); }
+function saveVerb(again) {
+  const inf = VS.inf.trim().toLowerCase(); if (!isInfinitive(inf)) { toast(L('Type a Spanish infinitive', 'Введите инфинитив')); return; }
+  if (VS.i < 0 && D.myverbs.some(x => x.i === inf)) return;
+  const meaning = VS.m.trim() || (BYINF[inf] ? (lang() === 'ru' ? BYINF[inf].ru : BYINF[inf].en) : ''), entry = { i: inf, m: meaning, k: VS.k, f: VS.f, c: Date.now() };
+  if (VS.i >= 0) D.myverbs[VS.i] = Object.assign(D.myverbs[VS.i], entry); else D.myverbs.push(entry);
+  if (VS.also && VS.list) { const l = listById(VS.list); if (l) addWord(l, inf, meaning, meaning); }
+  save(); if (again) { VS = { i: -1, inf: '', m: '', k: null, f: Array(6).fill(''), list: VS.list, also: VS.also }; drawVerbSheet(); toast(L('Saved', 'Сохранено')); render(); } else { closeSheet(); render(); }
+}
+function delVerb() { confirmBox(L('Delete this verb?', 'Удалить глагол?'), VS.inf, L('Delete', 'Удалить'), () => { D.myverbs.splice(VS.i, 1); save(); render(); }); }
+let _vsel = null;
+SCREENS.vlists = (m, b) => {
+  const lists = D.lists.map(l => ({ l, items: listVerbItems([l]) })).filter(x => x.items.length);
+  if (!lists.length) { m.innerHTML = `${backLink()}<h1>${L('Verbs from my lists', 'Глаголы из списков')}</h1><div class="center">${art('nolists', 'hero')}<p class="sub">${L('Your lists have no verbs yet. Add verbs like “comer – to eat” to any list.', 'В списках пока нет глаголов. Добавьте «comer – есть» в любой список.')}</p></div>`; return; }
+  _vsel = _vsel || new Set(lists.map(x => x.l.id));
+  m.innerHTML = `${backLink()}<div class="top"><h1>${L('Choose lists', 'Выберите списки')}</h1><button class="x" style="font-size:16px;font-weight:700" onclick="_vsel=_vsel.size===${lists.length}?new Set():new Set(${JSON.stringify(lists.map(x => x.l.id))});render()">${L('Select all', 'Выбрать все')}</button></div>` +
+    lists.map(({ l, items }) => `<div class="card row ${_vsel.has(l.id) ? 'sel' : ''}" onclick="_vsel.has('${l.id}')?_vsel.delete('${l.id}'):_vsel.add('${l.id}');render()"><div><b>${esc(l.name)}</b><small>${counted(items.length, 'verb', 'verbs', 'глагол', 'глагола', 'глаголов')}</small></div><span class="chev">${_vsel.has(l.id) ? '☑' : '☐'}</span></div>`).join('');
+  const n = listVerbItems(D.lists.filter(l => _vsel.has(l.id))).length;
+  b.innerHTML = `<div class="btnbar"><button class="primary" ${n ? '' : 'disabled'} onclick="startQuiz('lists')">${L('Start', 'Начать')} · ${counted(n, 'verb', 'verbs', 'глагол', 'глагола', 'глаголов')}</button></div>`;
+};
+
+/* ---- quiz ---- */
+let Q = null, choiceTimer = null;
+function startQuiz(src, n) {
+  let items, size = src === 'level' ? 20 : (D.set.size || 20), title;
+  if (src === 'level') { items = levelVerbs(n).map(catalogItem); title = lvTitle(n); }
+  else if (src === 'review') { items = reviewItems(); title = L('Smart review', 'Повторение'); if (!items.length) items = levelVerbs(1).map(catalogItem); }
+  else if (src === 'mine') { items = myItems(); title = L('My verbs', 'Мои глаголы'); }
+  else { items = listVerbItems(D.lists.filter(l => _vsel && _vsel.has(l.id))); title = L('From my lists', 'Из моих списков'); }
+  const cards = buildVerbCards(items, size); if (!cards.length) { toast(L('No verbs to practise', 'Нет глаголов для тренировки')); return; }
+  Q = { src, n, title, cards, i: 0, typed: '', res: null, chosen: undefined, out: [], done: false, sec: 0, pend: 0, last: Date.now() };
+  clearInterval(tickTimer); tickTimer = setInterval(() => { if (Q && !Q.done && Date.now() - Q.last < 60000) { Q.sec++; Q.pend++; } }, 1000);
+  go('vquiz');
+}
+const QCAP = { conj: () => L('Conjugate', 'Спрягайте'), trans: () => L('Translate', 'Переведите'), choice: () => L('Quick! · 8 s', 'Быстро! · 8 с') };
+SCREENS.vquiz = (m, b) => {
+  if (!Q) return resetTo('verbs'); if (Q.done) return vquizDone(m, b);
+  const c = Q.cards[Q.i], answered = Q.res != null;
+  const meP = lang() === 'ru' ? ME_RU[c.p] : ME_EN[c.p];
+  let body = '';
+  if (c.kind === 'trans') body = `<div class="big">${esc(meP)}</div><div class="en">${esc(c.it.meaning)}</div>`;
+  else body = `<div class="big">${esc(c.it.inf)}</div><div class="en">${esc(c.it.meaning)}</div><div style="margin-top:12px;font-size:24px;font-weight:700;color:var(--deep)">${PERSONS_CARD[c.p]}</div>`;
+  let fb = '';
+  if (answered) { const r = Q.res; fb = `<div class="fb ${r === 'correct' ? 'ok' : isGood(r) ? 'meh' : 'no'}">${r === 'timeout' ? L("Time's up!", 'Время вышло!') : r === 'correct' ? L('Correct', 'Верно') : r === 'accent' ? L('Almost! Check the accent', 'Почти! Проверьте ударение') : L('Not quite', 'Не совсем')}</div>${r !== 'correct' ? `<div class="hintx" style="margin-top:6px"><b style="color:var(--plum);font-size:20px">${esc(c.ans)}</b></div>` : ''}${c.kind !== 'choice' && Q.typed && r === 'wrong' ? `<div class="hintx">${L('You answered ', 'Вы ответили ')}${esc(Q.typed)}</div>` : ''}${r !== 'correct' && r !== 'accent' ? `<div class="hintx">${L('this one comes back soon', 'это слово скоро вернётся')}</div>` : ''}`; }
+  m.innerHTML = `<div class="top"><button class="x" onclick="endQuiz()">✕</button><p class="prog">${Q.i + 1} / ${Q.cards.length}</p></div><div class="bar"><i style="width:${Q.i / Q.cards.length * 100}%"></i></div>
+    <div class="flash" style="min-height:${c.kind === 'choice' ? 190 : 260}px;height:auto;padding:46px 16px 24px">${art('peek-thinking', 'peek')}<div class="cap">${QCAP[c.kind]()}</div><div>${body}${fb}</div></div>` +
+    (c.kind === 'choice' ? `<div class="bar t" style="margin:14px 0"><i id="tbar" style="width:100%"></i></div>` + c.options.map((o, k) => `<button class="optbtn ${answered ? (o === c.ans ? 'right' : (o === Q.chosen ? 'wrong' : '')) : ''}" ${answered ? 'disabled' : ''} onclick="choose(${k})">${esc(o)}</button>`).join('') :
+      (answered ? '' : `<input class="f" id="ans" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">`));
+  if (c.kind === 'choice') {
+    if (!answered) { setTimeout(() => { const t = $('#tbar'); if (t) { t.style.transition = 'width 8s linear'; t.style.width = '0%'; } }, 30); choiceTimer = setTimeout(() => { if (Q && !Q.done && Q.res == null) choose(null); }, 8000); }
+    b.innerHTML = answered ? `<div class="btnbar"><button class="primary" onclick="vnext()">${L('Next', 'Дальше')}</button></div>` : '';
+  } else if (answered) b.innerHTML = `<div class="btnbar"><button class="primary" onclick="vnext()">${L('Next', 'Дальше')}</button></div>`;
+  else { b.innerHTML = `<div class="btnbar"><button class="primary" onclick="vcheck()">${L('Check', 'Проверить')}</button></div>`; setTimeout(() => { const a = $('#ans'); if (a) { a.focus(); a.onkeydown = e => e.key === 'Enter' && vcheck(); } }, 0); }
+};
+function vrecord(c, ok) {
+  Q.out.push({ c, ok }); const k = vkey(c.it.inf, c.p), s = D.vstat[k] || (D.vstat[k] = { r: 0, m: 0, t: 0 });
+  s.r = ok ? Math.min(MAXR, s.r + 1) : Math.max(0, s.r - 1); if (!ok) s.m++; s.t = Date.now();
+  const d = dayStat(); d.a++; if (ok) d.c++; d.s += Q.pend; Q.pend = 0; Q.last = Date.now(); save(); buzz(ok);
+}
+function vcheck() { const c = Q.cards[Q.i], a = ($('#ans') || {}).value || ''; if (!a.trim()) return; Q.typed = a; Q.res = checkVerb(a, c.ans); vrecord(c, isGood(Q.res)); render(); }
+function choose(k) { clearTimeout(choiceTimer); const c = Q.cards[Q.i]; if (Q.res != null) return; Q.chosen = k == null ? null : c.options[k]; const ok = Q.chosen === c.ans; Q.res = k == null ? 'timeout' : ok ? 'correct' : 'wrong'; vrecord(c, ok); render(); }
+function vnext() { Q.last = Date.now(); if (Q.i + 1 < Q.cards.length) { Q.i++; Q.typed = ''; Q.res = null; Q.chosen = undefined; render(); } else finishQuiz(); }
+function endQuiz() { finishQuiz(); }
+function finishQuiz() {
+  clearTimeout(choiceTimer); const dd = dayStat(); dd.s += Q.pend; Q.pend = 0;
+  const pct = Q.out.length ? Math.round(Q.out.filter(o => o.ok).length / Q.out.length * 100) : 0;
+  if (Q.src === 'level' && Q.out.length && Q.out.length === Q.cards.length) recordLevel(Q.n, pct);
+  Q.done = true; save(); buzz(true); render();
+}
 function vquizDone(m, b) {
-  const s = vq, pass = s.ok / s.cards.length >= .8;
-  if (pass && s.level && !vpass.includes(s.level)) { vpass.push(s.level); store.set('vpass', vpass); }
-  m.innerHTML = `<h1 class="center">${pass ? t('Level passed!') : '¡Casi!'}</h1><p class="sub center">${s.ok} ${t('of')} ${s.cards.length} · ${t('Answer needs 80% to pass')}</p>${art(pass ? 'face-hearts' : 'face-sad','hero')}`;
-  b.innerHTML = `<div class="btnbar">${pass ? '' : `<button class="soft" onclick="startQuiz(${s.level})">${t('Try again')}</button>`}<button class="primary" onclick="vq=null;view=null;render()">${t('Done')}</button></div>`;
+  const correct = Q.out.filter(o => o.ok).length, pct = Q.out.length ? Math.round(correct / Q.out.length * 100) : 0, good = pct >= 80;
+  const lvl = Q.src === 'level', next = lvl && Q.n < 12 && D.vpass.includes(Q.n) ? Q.n + 1 : null;
+  const note = lvl ? (Q.out.length < Q.cards.length ? L('Finish all cards to pass the level.', 'Пройдите все карточки, чтобы сдать уровень.') : next ? L(`Level ${next} · ${lvTitle(next)} is open\n${lvExamples(next)}`, `Уровень ${next} · ${lvTitle(next)} открыт\n${lvExamples(next)}`) : D.vpass.length >= 12 ? L('All levels done. Keep them fresh with Smart review.', 'Все уровни пройдены. Повторяйте их.') : L('Get 80% to open the next level.', 'Наберите 80%, чтобы открыть следующий уровень.')) : '';
+  m.innerHTML = `<h1 class="center" style="color:var(--khakiT)">${esc(Q.title)}</h1><div class="center">${art(good ? 'face-stars' : 'face-tongue', 'hero')}</div><h1 class="center" style="font-size:30px;color:var(--khakiT)">${good ? '¡Muy bien!' : '¡Ánimo!'}</h1>
+    <p class="sub center">${L(`${correct} of ${Q.out.length} right`, `${correct} из ${Q.out.length} верно`)} · ${Q.sec < 60 ? L('under 1 min', 'меньше минуты') : formatDuration(Q.sec)}</p><p class="sub center rule">${esc(note)}</p>`;
+  b.innerHTML = `<div class="btnbar">${lvl && !D.vpass.includes(Q.n) || (lvl && Q.out.length < Q.cards.length) ? `<button class="soft" onclick="Q=null;back();startQuiz('level',${Q.n})">${L('Try again', 'Ещё раз')}</button>` : ''}${next ? `<button class="khaki" onclick="Q=null;back();go('learn',{n:${next}})">${L('Next level', 'Следующий уровень')}</button>` : `<button class="khaki" onclick="Q=null;back()">${L('Done', 'Готово')}</button>`}</div>`;
 }
 
-/* ---------- settings ---------- */
-function settings(m) {
-  const known = Object.values(ratings).filter(r => r >= 5).length, td = stats.day === today() ? stats : { answered: 0, correct: 0 };
-  m.innerHTML = `<h1>${t('Settings')}</h1>
-    <div class="stat"><div class="card"><b>${td.answered}</b><span>${t('Today')} · ${t('answers')}</span></div><div class="card"><b>${td.correct}</b><span>${t('correct')}</span></div></div>
-    <div class="stat"><div class="card"><b>${known}</b><span>${t('Words you know')}</span></div><div class="card"><b>${vpass.length}/12</b><span>${t('Verb levels passed')}</span></div></div>
-    <p class="sub">${t('Language')}</p><div class="seg"><button class="${lang==='en'?'on':''}" onclick="setLang('en')">English</button><button class="${lang==='ru'?'on':''}" onclick="setLang('ru')">Русский</button></div>
-    <p class="sub">${t('Card type')}</p><div class="seg"><button class="${mode==='flip'?'on':''}" onclick="setMode('flip')">${t('Cards')}</button><button class="${mode==='type'?'on':''}" onclick="setMode('type')">${t('Typing')}</button></div>`;
+/* =================== STATS =================== */
+let period = 'week';
+SCREENS.stats = (m, b) => {
+  const days = Object.entries(D.days), today = D.days[dayKey()] || { s: 0, a: 0, c: 0 };
+  const cutoff = period === 'week' ? 7 : period === 'month' ? 30 : 100000, since = new Date(); since.setDate(since.getDate() - cutoff);
+  const pd = days.filter(([k]) => period === 'all' || k > dayKey(since)).map(([, v]) => v);
+  const secs = pd.reduce((s, v) => s + v.s, 0), ans = pd.reduce((s, v) => s + v.a, 0), cor = pd.reduce((s, v) => s + v.c, 0);
+  const st = streak(), words = Object.values(D.words), arch = words.filter(w => fullyArchived(wk(w.es))).length, act = words.filter(w => !fullyArchived(wk(w.es)));
+  const strong = act.filter(w => w.r >= 5).length, learning = act.filter(w => w.r >= 1 && w.r <= 4).length, nw = act.length - strong - learning, total = words.length || 1;
+  const bars = []; const labels = lang() === 'ru' ? ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'] : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  if (period === 'all') { const t0 = new Date(); for (let i = 11; i >= 0; i--) { const d = new Date(t0.getFullYear(), t0.getMonth() - i, 1), pre = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); bars.push({ v: days.filter(([k]) => k.startsWith(pre)).reduce((s, [, x]) => s + x.s, 0) / 60, l: '', cur: i === 0 }); } }
+  else { const n = period === 'week' ? 7 : 30; for (let i = n - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); bars.push({ v: (D.days[dayKey(d)] || { s: 0 }).s / 60, l: period === 'week' ? labels[d.getDay()] : '', cur: i === 0 }); } }
+  const top = Math.max(1, ...bars.map(x => x.v));
+  m.innerHTML = `<h1>${L('Stats', 'Статистика')}</h1><div class="seg">${[['week', L('Week', 'Неделя')], ['month', L('Month', 'Месяц')], ['all', L('All time', 'Всё время')]].map(([k, lb]) => `<button class="${period === k ? 'on' : ''}" onclick="period='${k}';render()">${lb}</button>`).join('')}</div>
+    <div class="tiles"><div class="tile"><span>${L('Today', 'Сегодня')}</span><b>${formatDuration(today.s)}</b>${art('face-happy')}</div><div class="tile"><span>${period === 'week' ? L('Last 7 days', 'За 7 дней') : period === 'month' ? L('Last 30 days', 'За 30 дней') : L('All time', 'Всё время')}</span><b>${formatDuration(secs)}</b>${art('face-wink')}</div>
+    <div class="tile"><span>${L('Streak', 'Серия')}</span><b>${counted(st, 'day', 'days', 'день', 'дня', 'дней')}</b>${art('face-cool')}</div><div class="tile"><span>${L('Accuracy', 'Точность')}</span><b>${ans ? Math.round(cor / ans * 100) + '%' : '–'}</b>${art('face-stars')}</div></div>
+    <div class="card"><span class="sub" style="font-size:13px">${period === 'all' ? L('Minutes per month', 'Минут в месяц') : L('Minutes per day', 'Минут в день')}</span><div class="chart">${bars.map(x => `<div class="${x.cur ? 'cur' : ''}"><i style="height:${Math.max(3, 80 * x.v / top)}px"></i>${x.l}</div>`).join('')}</div></div>
+    <div class="card"><span class="sub" style="font-size:13px">${wordCount(words.length)}</span><div class="segbar"><i style="width:${strong / total * 100}%;background:#698039"></i><i style="width:${learning / total * 100}%;background:#C4D3A0"></i><i style="width:${nw / total * 100}%;background:#fff"></i><i style="width:${arch / total * 100}%;background:#FDFDC9"></i></div>
+    <div class="legend"><span>${strong} ${L('strong', 'выучено')}</span><span>${learning} ${L('learning', 'учу')}</span><span>${lang() === 'ru' ? nw + ' ' + plural(nw, 'новое', 'новых', 'новых') : nw + ' new'}</span>${arch ? `<span>${arch} ${L('archived', 'в архиве')}</span>` : ''}</div></div>
+    <div class="card row" onclick="backupSheet()"><div><b>${L('Backup', 'Резервная копия')}</b><small>${L('Saved in your Telegram account automatically', 'Автоматически хранится в вашем Telegram')}</small></div><span class="chev">›</span></div>
+    <p class="sub" style="margin:14px 0 6px">${L('Look', 'Оформление')}</p><div class="seg"><button class="${(D.set.look || 'tg') === 'tg' ? 'on' : ''}" onclick="D.set.look='tg';save();render()">Telegram</button><button class="${D.set.look === 'memo' ? 'on' : ''}" onclick="D.set.look='memo';save();render()">memo</button></div>
+    <p class="sub" style="margin:14px 0 6px">${L('Language', 'Язык')}</p><div class="seg"><button class="${lang() === 'en' ? 'on' : ''}" onclick="D.set.lang='en';save();render()">English</button><button class="${lang() === 'ru' ? 'on' : ''}" onclick="D.set.lang='ru';save();render()">Русский</button></div>`;
+};
+function backupSheet() {
+  const txt = JSON.stringify(D);
+  window._bk = txt;
+  openSheet(`<h2>${L('Backup', 'Резервная копия')}</h2><p class="hintx">${L('memo saves everything in your Telegram account on its own. To move to another account, copy this text and restore it there.', 'memo сам хранит всё в вашем Telegram. Чтобы перенести в другой аккаунт, скопируйте этот текст и восстановите там.')}</p>
+    <textarea id="bkt" style="min-height:120px">${esc(txt)}</textarea><div class="acts"><button class="soft" onclick="$('#bkt').select();try{navigator.clipboard.writeText($('#bkt').value)}catch{document.execCommand('copy')};toast(L('Copied','Скопировано'))">${L('Copy', 'Копировать')}</button><button class="bad" onclick="restoreBackup()">${L('Restore', 'Восстановить')}</button></div><button class="linkbtn" style="color:var(--deep)" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>`);
 }
-function setLang(x) { lang = x; store.set('lang', x); render(); }
-function setMode(x) { mode = x; store.set('mode', x); render(); }
+function restoreBackup() {
+  let c; try { c = JSON.parse($('#bkt').value); if (!c.words || !c.lists) throw 0; } catch { toast(L("That text couldn't be restored.", 'Не удалось восстановить.')); return; }
+  confirmBox(L('Replace everything?', 'Заменить всё?'), L('Your lists, words and stats will be replaced with this backup', 'Ваши списки, слова и статистика будут заменены'), L('Restore', 'Восстановить'), () => { D = Object.assign(fresh(), c); D.set = Object.assign(fresh().set, D.set); save(); resetTo(null); });
+}
+
+/* =================== BOOT =================== */
+let EXAMPLES = null;
+const hadLocal = loadLocal();
+Promise.all([fetch('examples.json').then(r => r.json()).catch(() => ({ lists: [] })), fetch('verbs.json').then(r => r.json())]).then(([ex, v]) => {
+  EXAMPLES = ex.lists; CATALOG = v; BYINF = {}; for (const x of v) if (!BYINF[x.i] || x.l > 0) BYINF[x.i] = x;
+  loadCloud(() => {
+    if (!hadLocal && !D.lists.length && !D.t) { migrateOld(); }
+    if (D.set.lang && D.set.name) installExamples();
+    save(); render();
+  });
+});
+setInterval(() => { if (typeof flushTime === 'function' && S && !S.done) flushTime(); }, 15000);
+document.addEventListener('visibilitychange', () => { if (document.hidden) { try { flushTime(); persistLocal(); pushCloud(); } catch {} } });
 </script></body></html>
