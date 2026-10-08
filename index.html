@@ -164,7 +164,7 @@ body.tgs .cell,.cell{width:100%}
 /* ---- keyboard open: give the typing box room ---- */
 body.kb nav{display:none}
 body.kb main{padding-bottom:8px}
-body.kb .flash{min-height:120px!important;height:auto!important;padding:46px 12px 14px;margin-top:56px}
+body.kb .flash{min-height:120px!important;height:auto!important;padding:46px 12px 14px}
 body.kb .flash .hint{display:none}body.kb .flash .big{font-size:30px}body.kb .flash .en{font-size:22px}
 body.kb .peek{width:112px;top:-48px}
 body.kb input.f{margin-top:10px}
@@ -457,7 +457,7 @@ const ICONS = {
 function nav() { document.body.dataset.tab = tab; $('#nav').innerHTML = Object.keys(ICONS).map(x => `<button class="${tab === x ? 'on' : ''}" onclick="setTab('${x}')"><svg viewBox="0 0 24 24">${ICONS[x]}</svg></button>`).join(''); }
 const SCREENS = {};
 function render() {
-  nav(); const m = $('#main'), b = $('#bar'); b.innerHTML = ''; m.scrollTop = 0; clearInterval(choiceTimer);
+  nav(); const m = $('#main'), b = $('#bar'); b.innerHTML = ''; m.scrollTop = 0; 
   if (!D.set.lang || !D.set.name) return welcome(m, b);
   const c = cur(); (SCREENS[c.n] || SCREENS.home)(m, b, c.p); applyChrome();
 }
@@ -805,7 +805,7 @@ function startQuiz(src, n) {
   clearInterval(tickTimer); tickTimer = setInterval(() => { if (Q && !Q.done && Date.now() - Q.last < 60000) { Q.sec++; Q.pend++; } }, 1000);
   go('vquiz');
 }
-const QCAP = { conj: () => L('Conjugate', 'Спрягайте'), trans: () => L('Translate', 'Переведите'), choice: () => L('Quick! · 8 s', 'Быстро! · 8 с') };
+const QCAP = { conj: () => L('Conjugate', 'Спрягайте'), trans: () => L('Translate', 'Переведите'), choice: () => L('Choose the right form', 'Выберите нужную форму') };
 SCREENS.vquiz = (m, b) => {
   if (!Q) return resetTo('verbs'); if (Q.done) return vquizDone(m, b);
   const c = Q.cards[Q.i], answered = Q.res != null;
@@ -814,13 +814,12 @@ SCREENS.vquiz = (m, b) => {
   if (c.kind === 'trans') body = `<div class="big">${esc(meP)}</div><div class="en">${esc(c.it.meaning)}</div>`;
   else body = `<div class="big">${esc(c.it.inf)}</div><div class="en">${esc(c.it.meaning)}</div><div style="margin-top:12px;font-size:24px;font-weight:700;color:var(--deep)">${PERSONS_CARD[c.p]}</div>`;
   let fb = '';
-  if (answered) { const r = Q.res; fb = `<div class="fb ${r === 'correct' ? 'ok' : isGood(r) ? 'meh' : 'no'}">${r === 'timeout' ? L("Time's up!", 'Время вышло!') : r === 'correct' ? L('Correct', 'Верно') : r === 'accent' ? L('Almost! Check the accent', 'Почти! Проверьте ударение') : L('Not quite', 'Не совсем')}</div>${r !== 'correct' ? `<div class="hintx" style="margin-top:6px"><b style="color:var(--plum);font-size:20px">${esc(c.ans)}</b></div>` : ''}${c.kind !== 'choice' && Q.typed && r === 'wrong' ? `<div class="hintx">${L('You answered ', 'Вы ответили ')}${esc(Q.typed)}</div>` : ''}${r !== 'correct' && r !== 'accent' ? `<div class="hintx">${L('this one comes back soon', 'это слово скоро вернётся')}</div>` : ''}`; }
+  if (answered) { const r = Q.res; fb = `<div class="fb ${r === 'correct' ? 'ok' : isGood(r) ? 'meh' : 'no'}">${r === 'correct' ? L('Correct', 'Верно') : r === 'accent' ? L('Almost! Check the accent', 'Почти! Проверьте ударение') : L('Not quite', 'Не совсем')}</div>${r !== 'correct' ? `<div class="hintx" style="margin-top:6px"><b style="color:var(--plum);font-size:20px">${esc(c.ans)}</b></div>` : ''}${c.kind !== 'choice' && Q.typed && r === 'wrong' ? `<div class="hintx">${L('You answered ', 'Вы ответили ')}${esc(Q.typed)}</div>` : ''}${r !== 'correct' && r !== 'accent' ? `<div class="hintx">${L('this one comes back soon', 'это слово скоро вернётся')}</div>` : ''}`; }
   m.innerHTML = `<div class="top"><button class="x" onclick="endQuiz()">✕</button><p class="prog">${Q.i + 1} / ${Q.cards.length}</p></div><div class="bar"><i style="width:${Q.i / Q.cards.length * 100}%"></i></div>
-    <div class="flash" style="min-height:${c.kind === 'choice' ? 190 : 260}px;height:auto;padding:46px 16px 24px">${art('peek-thinking', 'peek')}<div class="cap">${QCAP[c.kind]()}</div><div>${body}${fb}</div></div>` +
-    (c.kind === 'choice' ? `<div class="bar t" style="margin:14px 0"><i id="tbar" style="width:100%"></i></div>` + c.options.map((o, k) => `<button class="optbtn ${answered ? (o === c.ans ? 'right' : (o === Q.chosen ? 'wrong' : '')) : ''}" ${answered ? 'disabled' : ''} onclick="choose(${k})">${esc(o)}</button>`).join('') :
+    <div class="flash" style="min-height:${c.kind === 'choice' ? 170 : 240}px;height:auto;margin-top:14px;padding:46px 16px 24px"><div class="cap" style="top:16px">${QCAP[c.kind]()}</div><div>${body}${fb}</div></div>` +
+    (c.kind === 'choice' ? `<div style="height:14px"></div>` + c.options.map((o, k) => `<button class="optbtn ${answered ? (o === c.ans ? 'right' : (o === Q.chosen ? 'wrong' : '')) : ''}" ${answered ? 'disabled' : ''} onclick="choose(${k})">${esc(o)}</button>`).join('') :
       (answered ? '' : `<input class="f" id="ans" data-sp="1" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">${specialsHtml()}`));
   if (c.kind === 'choice') {
-    if (!answered) { setTimeout(() => { const t = $('#tbar'); if (t) { t.style.transition = 'width 8s linear'; t.style.width = '0%'; } }, 30); choiceTimer = setTimeout(() => { if (Q && !Q.done && Q.res == null) choose(null); }, 8000); }
     b.innerHTML = answered ? `<div class="btnbar"><button class="primary" onclick="vnext()">${L('Next', 'Дальше')}</button></div>` : '';
   } else if (answered) b.innerHTML = `<div class="btnbar"><button class="primary" onclick="vnext()">${L('Next', 'Дальше')}</button></div>`;
   else { b.innerHTML = `<div class="btnbar"><button class="primary" onclick="vcheck()">${L('Check', 'Проверить')}</button></div>`; setTimeout(() => { const a = $('#ans'); if (a) { a.focus(); a.onkeydown = e => e.key === 'Enter' && vcheck(); } }, 0); }
@@ -831,11 +830,11 @@ function vrecord(c, ok) {
   const d = dayStat(); d.a++; if (ok) d.c++; d.s += Q.pend; Q.pend = 0; Q.last = Date.now(); save(); buzz(ok);
 }
 function vcheck() { const c = Q.cards[Q.i], a = ($('#ans') || {}).value || ''; if (!a.trim()) return; Q.typed = a; Q.res = checkVerb(a, c.ans); vrecord(c, isGood(Q.res)); render(); }
-function choose(k) { clearTimeout(choiceTimer); const c = Q.cards[Q.i]; if (Q.res != null) return; Q.chosen = k == null ? null : c.options[k]; const ok = Q.chosen === c.ans; Q.res = k == null ? 'timeout' : ok ? 'correct' : 'wrong'; vrecord(c, ok); render(); }
+function choose(k) { const c = Q.cards[Q.i]; if (Q.res != null) return; Q.chosen = k == null ? null : c.options[k]; const ok = Q.chosen === c.ans; Q.res = ok ? 'correct' : 'wrong'; vrecord(c, ok); render(); }
 function vnext() { Q.last = Date.now(); if (Q.i + 1 < Q.cards.length) { Q.i++; Q.typed = ''; Q.res = null; Q.chosen = undefined; render(); } else finishQuiz(); }
 function endQuiz() { finishQuiz(); }
 function finishQuiz() {
-  clearTimeout(choiceTimer); const dd = dayStat(); dd.s += Q.pend; Q.pend = 0;
+  const dd = dayStat(); dd.s += Q.pend; Q.pend = 0;
   const pct = Q.out.length ? Math.round(Q.out.filter(o => o.ok).length / Q.out.length * 100) : 0;
   if (Q.src === 'level' && Q.out.length && Q.out.length === Q.cards.length) recordLevel(Q.n, pct);
   Q.done = true; save(); buzz(true); render();
