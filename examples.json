@@ -1,0 +1,149 @@
+{
+ "lists": [
+  {
+   "name": "Greetings · Saludos",
+   "words": [
+    {
+     "es": "¡Hola!",
+     "en": "hello",
+     "ru": "привет"
+    },
+    {
+     "es": "Buenos días",
+     "en": "good morning",
+     "ru": "доброе утро"
+    },
+    {
+     "es": "Buenas noches",
+     "en": "good night",
+     "ru": "спокойной ночи"
+    },
+    {
+     "es": "¡Adiós!",
+     "en": "goodbye",
+     "ru": "до свидания"
+    },
+    {
+     "es": "por favor",
+     "en": "please",
+     "ru": "пожалуйста"
+    },
+    {
+     "es": "gracias",
+     "en": "thank you",
+     "ru": "спасибо"
+    },
+    {
+     "es": "sí",
+     "en": "yes",
+     "ru": "да"
+    },
+    {
+     "es": "no",
+     "en": "no",
+     "ru": "нет"
+    },
+    {
+     "es": "¿Cómo estás?",
+     "en": "how are you?",
+     "ru": "как дела?"
+    },
+    {
+     "es": "Me llamo…",
+     "en": "my name is…",
+     "ru": "меня зовут…"
+    }
+   ]
+  },
+  {
+   "name": "Animals · Animales",
+   "words": [
+    {
+     "es": "el perro",
+     "en": "dog",
+     "ru": "собака"
+    },
+    {
+     "es": "el gato",
+     "en": "cat",
+     "ru": "кошка"
+    },
+    {
+     "es": "el pájaro",
+     "en": "bird",
+     "ru": "птица"
+    },
+    {
+     "es": "el caballo",
+     "en": "horse",
+     "ru": "лошадь"
+    },
+    {
+     "es": "la vaca",
+     "en": "cow",
+     "ru": "корова"
+    },
+    {
+     "es": "el ratón",
+     "en": "mouse",
+     "ru": "мышь"
+    },
+    {
+     "es": "el pez",
+     "en": "fish",
+     "ru": "рыба"
+    },
+    {
+     "es": "el conejo",
+     "en": "rabbit",
+     "ru": "кролик"
+    }
+   ]
+  },
+  {
+   "name": "Food · Comida",
+   "words": [
+    {
+     "es": "el pan",
+     "en": "bread",
+     "ru": "хлеб"
+    },
+    {
+     "es": "la leche",
+     "en": "milk",
+     "ru": "молоко"
+    },
+    {
+     "es": "la manzana",
+     "en": "apple",
+     "ru": "яблоко"
+    },
+    {
+     "es": "el agua",
+     "en": "water",
+     "ru": "вода"
+    },
+    {
+     "es": "el queso",
+     "en": "cheese",
+     "ru": "сыр"
+    },
+    {
+     "es": "el arroz",
+     "en": "rice",
+     "ru": "рис"
+    },
+    {
+     "es": "comer",
+     "en": "to eat",
+     "ru": "есть"
+    },
+    {
+     "es": "beber",
+     "en": "to drink",
+     "ru": "пить"
+    }
+   ]
+  }
+ ]
+}

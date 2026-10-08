@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>memo</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--lilac:#F3E9F8;--wisteria:#C69FD5;--deep:#8E5DB5;--pale:#EFE3F6;--plum:#3B2A47;--muted:#7A6A86;--lemon:#FDFDC9;--lemonB:#E3DF96;--pink:#F7E1E8;--wine:#7A2448;--khaki:#C4D3A0;--khakiT:#4F6128;--m:16px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;color:var(--plum);overflow:hidden}
+body{background:linear-gradient(160deg,#F7EEFB,#F5F2CF 60%,#F7E1E8);}
+#app{height:100%;display:flex;flex-direction:column}
+main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) var(--m) 16px}
+h1{font-size:34px;color:var(--deep);margin:8px 0 4px}
+.sub{color:var(--muted);margin:0 0 14px}
+.card{background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);border-radius:22px;padding:14px 18px;margin-bottom:10px;box-shadow:0 4px 18px rgba(142,93,181,.12)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
+.row b{font-size:18px}.row small{display:block;color:var(--muted);margin-top:2px}
+.chev{color:var(--deep);font-size:22px}
+.btnbar{display:flex;gap:10px;padding:10px var(--m) 12px}
+button{font:inherit;border:0;border-radius:999px;padding:16px 20px;font-weight:700;font-size:18px;cursor:pointer}
+.primary{flex:1;background:var(--deep);color:#fff}
+.lemon{flex:1;background:var(--lemon);color:var(--plum);border:2px solid var(--lemonB)}
+.soft{background:#DCC4EA;color:#5A3A75}
+.good{flex:1;background:var(--khaki);color:var(--khakiT)}
+.bad{flex:1;background:#EBBAC8;color:var(--wine)}
+nav{display:flex;justify-content:space-around;padding:10px 0 calc(env(safe-area-inset-bottom) + 10px);background:var(--wisteria)}
+nav button{background:none;padding:6px 18px;color:#6E4A8C;font-size:24px}
+nav button.on{color:var(--lemon)}
+.hello{display:block;width:70%;max-width:280px;margin:10px auto;transform:rotate(-4deg)}
+.word{display:flex;justify-content:space-between;align-items:center}
+.word span.es{font-size:19px;font-weight:600}.word small{color:var(--muted);display:block}
+.el{color:#4B7DB5}.la{color:#C9608A}
+.pill{min-width:34px;text-align:center;border-radius:12px;padding:4px 8px;font-weight:700;background:var(--pale);color:#6E4A8C}
+.pill.z{background:#EBBAC8;color:var(--wine)}.pill.hi{background:var(--wisteria);color:#fff}
+input[type=search]{width:100%;border:0;border-radius:999px;padding:14px 18px;font-size:17px;background:rgba(255,255,255,.8);margin-bottom:12px}
+.flash{position:relative;margin-top:56px;height:50vh;max-height:460px;margin-top:10px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:32px;background:rgba(255,255,255,.85);box-shadow:0 10px 30px rgba(142,93,181,.2);touch-action:pan-y;transition:transform .2s}
+.flash .es{font-size:36px;font-weight:800}.flash .en{font-size:26px;color:var(--deep);margin-top:14px}
+.flash .hint{position:absolute;bottom:16px;left:0;right:0;color:var(--muted);font-size:14px}
+.peek{position:absolute;top:-58px;left:50%;width:150px;transform:translateX(-50%) rotate(-4deg)}
+.prog{color:var(--muted);text-align:right;margin:0;font-weight:600}
+.back{color:var(--deep);font-size:18px;cursor:pointer;margin-bottom:6px;display:inline-block}
+.center{text-align:center}
+.seg{display:flex;gap:8px;margin-bottom:12px}.seg button{flex:1;padding:12px;font-size:16px;background:#fff;color:var(--deep);border:2px solid #DCC4EA}.seg button.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+input.f{width:100%;border:2px solid #DCC4EA;border-radius:18px;padding:14px 16px;font-size:18px;margin-bottom:10px;background:#fff}
+.fb{font-weight:700;font-size:20px;margin-top:12px}.ok{color:var(--khakiT)}.no{color:var(--wine)}
+</style></head>
+<body><div id="app"><main id="main"></main><div id="bar"></div><nav id="nav"></nav></div>
+<script>
+const tg = window.Telegram && Telegram.WebApp; if (tg) { tg.ready(); tg.expand(); }
+const $ = s => document.querySelector(s);
+// Per-person storage: Telegram cloud (follows the Telegram account), else this browser.
+const cloud = tg && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9') && tg.platform !== 'unknown' ? tg.CloudStorage : null;
+const mem = {};
+const store = {
+  get(k, d) { try { const v = mem[k] ?? localStorage.getItem('memo.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { const j = JSON.stringify(v); mem[k] = j; try { localStorage.setItem('memo.' + k, j); } catch {} if (cloud && j.length < 4000) try { cloud.setItem(k, j); } catch {} }
+};
+let lang = store.get('lang', 'en'), mode = store.get('mode', 'flip'), custom = store.get('custom', []), ratings = store.get('ratings', {});
+let base = [], tab = 'memorize', view = null, session = null, chosen = new Set(), q = '';
+const T = {'Memorize':'Учить','Lists':'Списки','Choose lists':'Выберите списки','‹ Back':'‹ Назад','Not yet':'Ещё нет','Knew it':'Знаю','Show answer':'Показать ответ','Done':'Готово','Search':'Поиск','Choose lists and memorize':'Выберите списки и учите','words':'слов','Check':'Проверить','Create list':'Создать список','Add word':'Добавить слово','Spanish':'По-испански','Meaning':'Значение','Save':'Сохранить','Typing':'Ввод','Cards':'Карточки','Stats':'Настройки','Verbs':'Глаголы','Coming next':'Скоро','known':'известно','of':'из','Your answer':'Ваш ответ','swipe right or tap to show the answer':'свайп вправо или нажмите, чтобы увидеть ответ','Right!':'Верно!','Not quite':'Не совсем','Next':'Дальше','List name':'Название списка','Language':'Язык','Card type':'Тип карточек','Start':'Начать','Example lists':'Примеры списков','My lists':'Мои списки','No words yet':'Пока нет слов','¡Hola amiga!':'¡Hola!'};
+const t = s => (lang === 'ru' && T[s]) || s;
+const key = es => es.toLowerCase().replace(/^(el|la|los|las|un|una)\s+/, '');
+const rate = es => ratings[key(es)] || 0;
+const art = (n, c) => `<img ${c ? `class="${c}" ` : ''}src="art/${n}.svg" alt="">`;
+const article = es => ({ el:'el', los:'el', un:'el', la:'la', las:'la', una:'la' })[es.split(' ')[0].toLowerCase()];
+const spanishHtml = es => { const a = article(es); if (!a) return esc(es); const [f, ...r] = es.split(' '); return `<span class="${a}">${esc(f)}</span> ${esc(r.join(' '))}`; };
+const esc = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const meaning = w => { if (lang === 'ru') return w.ru || w.en || ''; const f = w.es.split(' ')[0].toLowerCase(); return ['el','la','los','las'].includes(f) && !/^the /.test(w.en) ? 'the ' + w.en : w.en; };
+const all = () => [...base, ...custom];
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[¡!¿?.,]/g, '').trim();
+
+fetch('examples.json').then(r => r.json()).then(d => { base = d.lists; render(); });
+if (cloud) ['ratings','custom','lang','mode'].forEach(k => cloud.getItem(k, (e, v) => { if (!e && v) { mem[k] = v; try { localStorage.setItem('memo.' + k, v); } catch {} lang = store.get('lang','en'); mode = store.get('mode','flip'); custom = store.get('custom',[]); ratings = store.get('ratings',{}); render(); } }));
+
+function nav() { $('#nav').innerHTML = [['memorize','🃏'],['lists','📚'],['verbs','📖'],['stats','⚙️']].map(([x,i]) => `<button class="${tab===x?'on':''}" onclick="go('${x}')">${i}</button>`).join(''); }
+function go(x) { tab = x; view = null; session = null; render(); }
+function render() {
+  nav(); const m = $('#main'), b = $('#bar'); b.innerHTML = ''; m.scrollTop = 0;
+  if (session) return renderCard(m, b);
+  if (tab === 'memorize') return view === 'pick' ? pick(m, b) : home(m, b);
+  if (tab === 'lists') return view === null ? listsView(m, b) : listView(m, b);
+  if (tab === 'stats') return settings(m);
+  m.innerHTML = `<h1>${t('Verbs')}</h1><p class="sub">${t('Coming next')}</p><div class="center">${art('nolists')}</div>`;
+}
+function home(m, b) {
+  m.innerHTML = `<h1>${t('¡Hola amiga!')}</h1><p class="sub">${t('Choose lists and memorize')}</p><div class="center">${art('hello','hello')}</div>`;
+  b.innerHTML = `<div class="btnbar"><button class="lemon" onclick="view='pick';render()">${t('Memorize')}</button></div>`;
+}
+function pick(m, b) {
+  const L = all();
+  m.innerHTML = `<span class="back" onclick="view=null;render()">${t('‹ Back')}</span><h1>${t('Choose lists')}</h1>` +
+    L.map((l, i) => `<div class="card row" onclick="toggle(${i})"><div><b>${esc(l.name)}</b><small>${l.words.length} ${t('words')}</small></div><span class="chev">${chosen.has(i)?'●':'○'}</span></div>`).join('');
+  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="start()" ${chosen.size?'':'disabled style="opacity:.5"'}>${t('Start')}</button></div>`;
+}
+function toggle(i) { chosen.has(i) ? chosen.delete(i) : chosen.add(i); const y = $('#main').scrollTop; render(); $('#main').scrollTop = y; }
+function start() {
+  const L = all(), seen = new Set(), pool = [];
+  for (const i of chosen) for (const w of (L[i] || {words:[]}).words) if (!seen.has(key(w.es))) { seen.add(key(w.es)); pool.push(w); }
+  const cards = pool.map(w => ({ w, s: Math.random() * (1 + rate(w.es)) })).sort((a, b) => a.s - b.s).slice(0, 20).map(x => x.w);
+  session = { cards, i: 0, shown: false, ok: 0, result: null }; render();
+}
+function renderCard(m, b) {
+  const s = session;
+  if (s.i >= s.cards.length) {
+    m.innerHTML = `<h1 class="center">¡Muy bien!</h1><p class="sub center">${s.ok} ${t('of')} ${s.cards.length} ${t('known')}</p><div class="center">${art('face-hearts','hello')}</div>`;
+    b.innerHTML = `<div class="btnbar"><button class="primary" onclick="session=null;view=null;render()">${t('Done')}</button></div>`; return;
+  }
+  const w = s.cards[s.i], typing = mode === 'type';
+  const back = s.shown ? `<div class="en">${esc(meaning(w))}</div>` : '';
+  const fb = s.result == null ? '' : `<div class="fb ${s.result?'ok':'no'}">${s.result ? t('Right!') : t('Not quite')}</div>`;
+  m.innerHTML = `<p class="prog">${s.i+1} / ${s.cards.length}</p><div class="flash" id="flash" ${typing?'':'onclick="reveal()"'}>
+    ${art('peek-happy','peek')}<div><div class="es">${spanishHtml(w.es)}</div>${back}${fb}</div>
+    ${s.shown || typing ? '' : `<div class="hint">${t('swipe right or tap to show the answer')}</div>`}</div>` +
+    (typing && !s.shown ? `<input class="f" id="ans" placeholder="${t('Your answer')}" autocomplete="off" autocapitalize="off" style="margin-top:14px">` : '');
+  if (typing && !s.shown) { b.innerHTML = `<div class="btnbar"><button class="primary" onclick="check()">${t('Check')}</button></div>`; setTimeout(() => { const a = $('#ans'); a && a.focus(); a && a.addEventListener('keydown', e => e.key === 'Enter' && check()); }, 0); return; }
+  if (typing) { b.innerHTML = `<div class="btnbar"><button class="primary" onclick="answer(session.result)">${t('Next')}</button></div>`; return; }
+  b.innerHTML = s.shown ? `<div class="btnbar"><button class="bad" onclick="answer(false)">${t('Not yet')}</button><button class="good" onclick="answer(true)">${t('Knew it')}</button></div>`
+                        : `<div class="btnbar"><button class="soft" onclick="redo()">↶</button><button class="lemon" onclick="reveal()">${t('Show answer')}</button></div>`;
+  let x0 = null; const f = $('#flash');
+  f.ontouchstart = e => x0 = e.touches[0].clientX;
+  f.ontouchend = e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (dx > 60) reveal(); else if (dx < -60) redo(); };
+}
+function reveal() { if (!session.shown) { session.shown = true; render(); } }
+function redo() { if (session.i > 0) { session.i--; session.shown = false; session.result = null; render(); } }
+function check() {
+  const w = session.cards[session.i], a = norm(($('#ans') || {}).value || '');
+  const right = (lang === 'ru' ? w.ru : w.en).split(/[,/;]/).concat(lang === 'en' ? [meaning(w)] : []).map(norm).map(x => x.replace(/^(the|to) /, ''));
+  session.result = right.includes(a.replace(/^(the|to) /, '')); session.shown = true; render();
+}
+function answer(ok) {
+  const w = session.cards[session.i], k = key(w.es);
+  ratings[k] = Math.max(0, (ratings[k] || 0) + (ok ? 1 : -1)); store.set('ratings', ratings); if (ok) session.ok++;
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(ok ? 'success' : 'warning');
+  session.i++; session.shown = false; session.result = null; render();
+}
+function listsView(m, b) {
+  const sec = (title, arr, off) => arr.length ? `<p class="sub" style="margin-top:14px">${title}</p>` + arr.map((l, i) => `<div class="card row" onclick="openList(${i + off})"><div><b>${esc(l.name)}</b><small>${l.words.length} ${t('words')}</small></div><span class="chev">›</span></div>`).join('') : '';
+  m.innerHTML = `<h1>${t('Lists')}</h1>` + sec(t('My lists'), custom, base.length) + sec(t('Example lists'), base, 0);
+  b.innerHTML = `<div class="btnbar"><button class="primary" onclick="newList()">${t('Create list')}</button></div>`;
+}
+function newList() { const n = (prompt(t('List name')) || '').trim(); if (!n) return; custom.push({ name: n, words: [] }); store.set('custom', custom); openList(base.length + custom.length - 1); }
+function openList(i) { view = i; q = ''; render(); }
+function listView(m, b) {
+  const l = all()[view], mine = view >= base.length;
+  m.innerHTML = `<span class="back" onclick="view=null;render()">${t('‹ Back')}</span><h1 style="font-size:28px">${esc(l.name)}</h1><p class="sub">${l.words.length} ${t('words')}</p>
+    <input type="search" placeholder="${t('Search')}" oninput="q=this.value;words()"><div id="words"></div>`; words();
+  b.innerHTML = mine ? `<div class="btnbar"><button class="primary" onclick="addWord()">${t('Add word')}</button></div>` : '';
+}
+function addWord() {
+  const es = (prompt(t('Spanish')) || '').trim(); if (!es) return; const m = (prompt(t('Meaning')) || '').trim(); if (!m) return;
+  custom[view - base.length].words.push(lang === 'ru' ? { es, en: m, ru: m } : { es, en: m.replace(/^the /i, ''), ru: m }); store.set('custom', custom); render();
+}
+function words() {
+  const l = all()[view], tt = q.toLowerCase();
+  $('#words').innerHTML = [...l.words].filter(w => !tt || w.es.toLowerCase().includes(tt) || meaning(w).toLowerCase().includes(tt))
+    .sort((a, b) => key(a.es).localeCompare(key(b.es), 'es')).map(w => { const r = rate(w.es);
+      return `<div class="card word"><div><span class="es">${spanishHtml(w.es)}</span><small>${esc(meaning(w))}</small></div><span class="pill ${r==0?'z':r>=5?'hi':''}">${r}</span></div>`; }).join('') || `<p class="sub center">${t('No words yet')}</p>`;
+}
+function settings(m) {
+  m.innerHTML = `<h1>${t('Stats')}</h1><p class="sub">${t('Language')}</p><div class="seg"><button class="${lang==='en'?'on':''}" onclick="setLang('en')">English</button><button class="${lang==='ru'?'on':''}" onclick="setLang('ru')">Русский</button></div>
+    <p class="sub">${t('Card type')}</p><div class="seg"><button class="${mode==='flip'?'on':''}" onclick="setMode('flip')">${t('Cards')}</button><button class="${mode==='type'?'on':''}" onclick="setMode('type')">${t('Typing')}</button></div>`;
+}
+function setLang(x) { lang = x; store.set('lang', x); render(); }
+function setMode(x) { mode = x; store.set('mode', x); render(); }
+</script></body></html>
