@@ -823,12 +823,13 @@ SCREENS.vquiz = (m, b) => {
   if (!Q) return resetTo('verbs'); if (Q.done) return vquizDone(m, b);
   const c = Q.cards[Q.i], shown = !!Q.shown, meP = lang() === 'ru' ? ME_RU[c.p] : ME_EN[c.p];
   const reg = regularForms(c.it.inf)[c.p], irr = c.ans !== reg;
-  const front = c.kind === 'trans'
-    ? `<div class="big">${esc(meP)}</div><div class="en">${esc(c.it.meaning)}</div>`
-    : `<div class="big">${esc(c.it.inf)}</div><div class="en">${esc(c.it.meaning)}</div><div style="margin-top:12px;font-size:24px;font-weight:700;color:var(--deep)">${PERSONS_CARD[c.p]}</div>`;
-  const back = shown ? `<hr><div class="big dark" style="${irr ? 'color:#C9608A' : ''}">${esc(c.ans)}</div>${c.kind === 'trans' ? `<div class="hintx" style="margin-top:6px">${esc(c.it.inf)} · ${PERSONS_CARD[c.p]}</div>` : ''}` : '';
+  const mean = c.it.meaning || c.it.inf, pers = PERSONS_CARD[c.p];
+  const q = L(`How do you say “${mean}” for “${meP}”?`, `Как сказать «${mean}» для «${meP}»?`);
+  const front = `<div class="big" style="font-size:40px">${esc(meP)} <span style="color:var(--hint,var(--muted));font-weight:600">·</span> ${esc(pers)}</div>
+    <div class="en" style="margin-top:14px">${esc(mean)}</div><div style="font-size:22px;font-weight:700;color:var(--deep);margin-top:4px">${esc(c.it.inf)}</div>`;
+  const back = shown ? `<hr><div class="big dark" style="font-size:44px;${irr ? 'color:#C9608A' : ''}">${esc(c.ans)}</div>` : '';
   m.innerHTML = `<div class="top"><button class="x" onclick="endQuiz()">✕</button><p class="prog">${Q.i + 1} / ${Q.cards.length}</p></div><div class="bar"><i style="width:${Q.i / Q.cards.length * 100}%"></i></div>
-    <div class="flash" id="vflash" style="min-height:260px;height:auto;margin-top:14px;padding:46px 16px 34px" ${shown ? '' : 'onclick="vshow()"'}><div class="cap" style="top:16px">${c.kind === 'trans' ? L('Say it in Spanish', 'Скажите по-испански') : L('Conjugate', 'Проспрягайте')}</div><div>${front}${back}</div>
+    <div class="flash" id="vflash" style="min-height:260px;height:auto;margin-top:14px;padding:46px 16px 34px" ${shown ? '' : 'onclick="vshow()"'}><div class="cap" style="top:16px;padding:0 14px;font-size:14px">${esc(q)}</div><div style="margin-top:14px">${front}${back}</div>
     ${shown ? '' : `<div class="hint">${L('Swipe right or tap to show the answer', 'Свайп вправо или нажмите, чтобы увидеть ответ')}</div>`}</div>`;
   b.innerHTML = shown ? `<div class="btnbar"><button class="bad" onclick="vjudge(false)">${L('Wrong', 'Неверно')}</button><button class="good" onclick="vjudge(true)">${L('Correct', 'Верно')}</button></div>`
                       : `<div class="btnbar"><button class="primary" onclick="vshow()">${L('Show answer', 'Показать ответ')}</button></div>`;
