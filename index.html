@@ -13,7 +13,7 @@ body[data-tab=stats]{--band:#F6E2D8;--on:#8E5DB5;--off:#D2B8AC;--bgA:#FFF0E9;--b
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;font-family:-apple-system,"SF Pro Rounded",system-ui,sans-serif;color:var(--plum);overflow:hidden}
 body{background:radial-gradient(circle at 12% 8%,var(--bgA) 0,transparent 55%),radial-gradient(circle at 92% 92%,var(--bgC) 0,transparent 55%),var(--bgB);transition:background .3s}
-#app{height:100%;display:flex;flex-direction:column}
+#app{height:var(--tg-viewport-height,100%);display:flex;flex-direction:column}
 main{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) var(--m) 16px;-webkit-overflow-scrolling:touch}
 h1{font-size:34px;line-height:1.1;color:var(--deep);margin:8px 0 4px;letter-spacing:-.5px}
 .sub{color:var(--muted);margin:0 0 12px;font-size:16px}
@@ -80,9 +80,9 @@ td b.irr{color:#C9608A}
 .optbtn{display:block;width:100%;background:#fff;border:2px solid #DCC4EA;color:var(--plum);margin-bottom:10px;padding:18px}
 .optbtn.right{background:var(--khaki);border-color:#698039}.optbtn.wrong{background:var(--cameo);border-color:var(--wine)}
 .undo{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 150px);transform:translateX(-50%);background:var(--plum);color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;z-index:5;white-space:nowrap}
-#sheet{position:fixed;inset:0;background:rgba(59,42,71,.45);display:none;align-items:flex-end;justify-content:center;z-index:9}
+#sheet{position:fixed;top:0;left:0;right:0;height:var(--tg-viewport-height,100%);background:rgba(59,42,71,.45);display:none;align-items:flex-end;justify-content:center;z-index:9}
 #sheet.on{display:flex}
-#sheet .box{width:100%;max-width:520px;max-height:90vh;overflow:auto;background:linear-gradient(160deg,#fff,#F8F0FB);border-radius:30px 30px 0 0;padding:20px var(--m) calc(env(safe-area-inset-bottom) + 18px)}
+#sheet .box{width:100%;max-width:520px;max-height:92%;overflow:auto;background:linear-gradient(160deg,#fff,#F8F0FB);border-radius:30px 30px 0 0;padding:20px var(--m) calc(env(safe-area-inset-bottom) + 18px)}
 #sheet h2{margin:0 0 6px;color:var(--deep);font-size:24px}
 #sheet textarea{width:100%;min-height:170px;border:2px solid #DCC4EA;border-radius:18px;padding:14px;font:inherit;font-size:16px;background:#fff;margin:8px 0;resize:vertical}
 #sheet input[type=text]{width:100%;border:2px solid #DCC4EA;border-radius:18px;padding:13px 16px;font:inherit;font-size:17px;background:#fff;margin-bottom:8px}
@@ -160,6 +160,21 @@ body.isdark.tgs .linkbtn{color:#ff8c84}body.isdark.tgs .chev{color:#b9b9c2}
 body.dark .soft{background:#6B5590;color:#fff;border:1.5px solid #9A82C4}body.dark .bad{background:#7a2c4a;color:#ffd9e6;border:1.5px solid #c4607f}body.dark .good{background:#46622b;color:#e8f8cf;border:1.5px solid #86aa4c}
 body.dark .seg button{color:#fff;opacity:.85}body.dark .seg button.on{opacity:1}body.dark nav button{color:#BBA8D6}body.dark nav button.on{color:#FDFDC9}
 body.dark .chips button,body.dark .optbtn{border-color:#8A74B0;color:#fff}body.dark .x{color:#E6D5F2}
+body.tgs .cell,.cell{width:100%}
+/* ---- keyboard open: give the typing box room ---- */
+body.kb nav{display:none}
+body.kb main{padding-bottom:8px}
+body.kb .flash{min-height:120px!important;height:auto!important;padding:46px 12px 14px;margin-top:56px}
+body.kb .flash .hint{display:none}body.kb .flash .big{font-size:30px}body.kb .flash .en{font-size:22px}
+body.kb .peek{width:112px;top:-48px}
+body.kb input.f{margin-top:10px}
+body.kb .homewrap{min-height:0}
+.specials{display:flex;gap:5px;margin:8px 0 2px}
+.specials button{flex:1;min-width:0;padding:10px 0;font-size:20px;font-weight:600;border-radius:10px;background:#fff;color:var(--plum);border:1.5px solid #DCC4EA}
+.specials button.shift{flex:1.3;color:var(--deep)}.specials.up button.shift{background:var(--deep);color:#fff}
+.specials.up button.c{text-transform:uppercase}
+body.tgs .specials button{background:var(--sec);border-color:var(--sep);color:var(--txt)}body.tgs .specials.up button.shift{background:var(--btn);color:var(--btnt)}
+body.dark .specials button{background:#2A2038;border-color:#8A74B0;color:#fff}
 </style></head>
 <body data-tab="memorize"><div id="sheet" onclick="if(event.target===this)closeSheet()"><div class="box" id="box"></div></div><div id="app"><main id="main"></main><div id="bar"></div><nav id="nav"></nav></div>
 <script>
@@ -461,6 +476,18 @@ function applyChrome() {
 }
 if (tg) { try { tg.onEvent('themeChanged', applyChrome); if (nativeBack) tg.BackButton.onClick(() => { if (S && S.done) { S = null; } if (Q && Q.done) { Q = null; } back(); }); } catch {} }
 const bar = html => { $('#bar').innerHTML = `<div class="btnbar">${html}</div>`; };
+const SPECIALS = ['á','é','í','ó','ú','ñ','ü','¿','¡'];
+let _spUp = false, _spField = null;
+const specialsHtml = () => `<div class="specials ${_spUp ? 'up' : ''}" id="specials">${SPECIALS.map(c => `<button class="c" onpointerdown="event.preventDefault()" onmousedown="event.preventDefault()" onclick="insertSp('${c}')">${c}</button>`).join('')}<button class="shift" onpointerdown="event.preventDefault()" onmousedown="event.preventDefault()" onclick="toggleShift()">⇧</button></div>`;
+function toggleShift() { _spUp = !_spUp; document.querySelectorAll('.specials').forEach(s => s.classList.toggle('up', _spUp)); }
+function insertSp(ch) {
+  const el = _spField && document.body.contains(_spField) ? _spField : document.querySelector('[data-sp]'); if (!el) return;
+  const c = _spUp ? ch.toUpperCase() : ch; el.focus();
+  const s = el.selectionStart ?? el.value.length, e = el.selectionEnd ?? el.value.length;
+  el.value = el.value.slice(0, s) + c + el.value.slice(e); el.selectionStart = el.selectionEnd = s + c.length;
+  el.dispatchEvent(new Event('input', { bubbles: true })); tap();
+}
+document.addEventListener('focusin', e => { if (e.target.dataset && e.target.dataset.sp) _spField = e.target; });
 function openSheet(html) { $('#box').innerHTML = html; $('#sheet').classList.add('on'); }
 function closeSheet() { $('#sheet').classList.remove('on'); }
 function confirmBox(title, msg, ok, fn) { try { if (tg && tg.showConfirm && tg.isVersionAtLeast('6.2') && tg.platform !== 'unknown') { tg.showPopup({ title: String(title).slice(0, 64), message: String(msg || ' ').slice(0, 256), buttons: [{ id: 'ok', type: 'destructive', text: ok }, { type: 'cancel' }] }, id => { if (id === 'ok') fn(); }); return; } } catch {} window._ok = () => { closeSheet(); fn(); }; openSheet(`<h2>${esc(title)}</h2><p class="hintx">${esc(msg)}</p><div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button><button class="bad" onclick="_ok()">${esc(ok)}</button></div>`); }
@@ -546,7 +573,7 @@ SCREENS.session = (m, b) => {
   m.innerHTML = `<div class="top"><button class="x" onclick="endSession()">✕</button><p class="prog">${S.i + 1} / ${S.cards.length}</p></div><div class="bar"><i style="width:${S.i / S.cards.length * 100}%"></i></div>
     <div class="flash" id="flash" ${!typing && !flipped ? 'onclick="showAns()"' : ''}>${art('peek-happy', 'peek')}<div class="cap">${capText(c.kind)}</div><div>${front}${back}${fb}</div>
     ${!typing && !flipped ? `<div class="hint">${L('Swipe right or tap to show the answer', 'Свайп вправо или нажмите, чтобы увидеть ответ')}</div>` : ''}</div>` +
-    (typing && !S.res ? `<input class="f" id="ans" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">` : '');
+    (typing && !S.res ? `<input class="f" id="ans" data-sp="1" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">${specialsHtml()}` : '');
   const undo = S.undo.length ? `<button class="soft" onclick="redoLast()">↶</button>` : '';
   if (typing && !S.res) { b.innerHTML = `<div class="btnbar">${undo}<button class="primary" onclick="checkTypedCard()">${L('Check', 'Проверить')}</button></div>`; setTimeout(() => { const a = $('#ans'); if (a) { a.focus(); a.onkeydown = e => e.key === 'Enter' && checkTypedCard(); } }, 0); }
   else if (typing) b.innerHTML = `<div class="btnbar">${undo}<button class="primary" onclick="nextCard()">${L('Next', 'Дальше')}</button></div>`;
@@ -632,7 +659,7 @@ function wordSheet(listId, key) {
     save(); if (again) { $('#wes').value = ''; $('#wen').value = ''; $('#wes').focus(); toast(L('Added', 'Добавлено')); render(); } else { closeSheet(); render(); }
   };
   window._wa = () => { archiveWord(l, wk(w.es)); save(); closeSheet(); render(); const t = document.createElement('div'); t.className = 'undo'; t.innerHTML = L('Undo archive', 'Вернуть из архива'); t.onclick = () => { const m = l.m.find(x => x.k === wk(w.es)); if (m) m.a = 0; save(); t.remove(); render(); }; document.body.appendChild(t); setTimeout(() => t.remove(), 4000); };
-  openSheet(`<h2>${w ? L('Edit word', 'Изменить слово') : L('Add word', 'Добавить слово')}</h2><input type="text" id="wes" placeholder="${L('Spanish, like el perro', 'По-испански, например el perro')}" value="${esc(w ? w.es : '')}" autocomplete="off" autocapitalize="off"><input type="text" id="wen" placeholder="${L('Meaning, like the dog', 'Значение')}" value="${esc(w ? meaningOf(w) : '')}" autocomplete="off"><p class="warn" id="werr"></p>
+  openSheet(`<h2>${w ? L('Edit word', 'Изменить слово') : L('Add word', 'Добавить слово')}</h2><input type="text" id="wes" data-sp="1" placeholder="${L('Spanish, like el perro', 'По-испански, например el perro')}" value="${esc(w ? w.es : '')}" autocomplete="off" autocapitalize="off">${specialsHtml()}<input type="text" id="wen" placeholder="${L('Meaning, like the dog', 'Значение')}" value="${esc(w ? meaningOf(w) : '')}" autocomplete="off"><p class="warn" id="werr"></p>
     <div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>${w ? `<button class="soft" onclick="_wa()">${L('Archive', 'В архив')}</button>` : `<button class="soft" onclick="_ws(true)">${L('Add another', 'Ещё')}</button>`}<button class="primary" onclick="_ws(false)">${L('Save', 'Сохранить')}</button></div>`);
   setTimeout(() => { const i = $('#wes'); i && !w && i.focus(); }, 60);
 }
@@ -650,7 +677,7 @@ function parseAny(text) {
 function mergeWords(list, words) { let added = 0, there = 0; for (const w of words) { const k = wk(w.es), had = list.m.some(x => x.k === k && !x.a); if (had) { there++; continue; } addWord(list, w.es, w.en, w.ru); added++; } return { added, there }; }
 function addManySheet(id) {
   window._am = () => { const l = listById(id), r = mergeWords(l, parseWords($('#bulk').value)); save(); closeSheet(); render(); toast(L(`${wordCount(r.added)} added`, `Добавлено: ${wordCount(r.added)}`) + (r.there ? ` · ${r.there} ${L('already there', 'уже были')}` : '')); };
-  openSheet(`<h2>${L('Add many', 'Много слов')}</h2><p class="hintx">${L('One word per line: Spanish, meaning', 'По одному слову в строке: испанский, значение')}</p><textarea id="bulk" placeholder="el perro, dog&#10;el gato, cat&#10;comer, to eat"></textarea><div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button><button class="primary" onclick="_am()">${L('Add', 'Добавить')}</button></div>`);
+  openSheet(`<h2>${L('Add many', 'Много слов')}</h2><p class="hintx">${L('One word per line: Spanish, meaning', 'По одному слову в строке: испанский, значение')}</p><textarea id="bulk" data-sp="1" placeholder="el perro, dog&#10;el gato, cat&#10;comer, to eat"></textarea>${specialsHtml()}<div class="acts"><button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button><button class="primary" onclick="_am()">${L('Add', 'Добавить')}</button></div>`);
 }
 SCREENS.archived = (m, b) => {
   const rows = archivedRows(); const q = (cur().p.q || '').toLowerCase();
@@ -720,23 +747,31 @@ function verbSheet(i) {
   VS = { i, inf: e ? e.i : '', m: e ? e.m : '', k: e ? e.k : null, f: e ? e.f.slice() : Array(6).fill(''), list: '', also: false };
   drawVerbSheet();
 }
-function drawVerbSheet() {
+function previewHtml() {
   const v = VS, it = v.inf.trim() ? verbItem(v.inf, v.m, v.k, v.f) : null;
-  const types = [['', L('Auto', 'Авто')], ['regular', L('Regular', 'Правильный')], ['e-ie', 'e → ie'], ['o-ue', 'o → ue'], ['e-i', 'e → i'], ['u-ue', 'u → ue'], ['irregular', L('Irregular', 'Неправильный')]];
   const dup = v.i < 0 && v.inf.trim() && D.myverbs.some(x => x.i === v.inf.trim().toLowerCase());
+  if (!it) return '';
+  const auto = verbItem(v.inf, v.m, v.k, Array(6).fill(''));
+  return (dup ? `<p class="warn">${L('Already in My verbs', 'Уже в «Моих глаголах»')}</p>` : '') +
+    `<p class="hintx">${L('Tap a type and the table changes. Tap any form to fix it by hand.', 'Выберите тип — таблица изменится. Нажмите на форму, чтобы исправить.')} ${it.guessed ? `<span class="warn">${L('Type · please check (memo guessed regular)', 'Проверьте тип (memo решил: правильный)')}</span>` : ''}</p>
+    <div class="card"><table>${it.forms.map((x, p) => `<tr><td>${PERSONS[p]}</td><td><input type="text" class="cell" data-sp="1" value="${esc(x ?? '')}" data-auto="${esc(auto.forms[p] ?? '')}" oninput="setForm(${p},this)" autocapitalize="off" autocomplete="off" style="margin:0;padding:8px 10px;font-size:17px;font-weight:700"></td></tr>`).join('')}</table></div>`;
+}
+function refreshPreview() { const el = $('#vprev'); if (el) el.innerHTML = previewHtml(); }
+function setForm(p, el) { VS.f[p] = el.value.trim() === el.dataset.auto ? '' : el.value.trim(); }
+function vinfInput(el) { VS.inf = el.value; refreshPreview(); }
+function vinfDone(el) { VS.inf = el.value; const b = BYINF[VS.inf.trim().toLowerCase()]; if (b && !VS.m.trim()) { VS.m = lang() === 'ru' ? b.ru : b.en; const f = $('#vmean'); if (f) f.value = VS.m; } refreshPreview(); }
+function drawVerbSheet() {
+  const v = VS;
+  const types = [['', L('Auto', 'Авто')], ['regular', L('Regular', 'Правильный')], ['e-ie', 'e → ie'], ['o-ue', 'o → ue'], ['e-i', 'e → i'], ['u-ue', 'u → ue'], ['irregular', L('Irregular', 'Неправильный')]];
   openSheet(`<h2>${v.i >= 0 ? L('Edit verb', 'Изменить глагол') : L('Add verb', 'Добавить глагол')}</h2>
-    <input type="text" id="vinf" placeholder="${L('Type the infinitive, like hablar, comer or vivir', 'Инфинитив: hablar, comer, vivir')}" value="${esc(v.inf)}" oninput="VS.inf=this.value" onchange="autoMeaning();drawVerbSheet()" autocapitalize="off" autocomplete="off">
-    ${dup ? `<p class="warn">${L('Already in My verbs', 'Уже в «Моих глаголах»')}</p>` : ''}
-    <input type="text" id="vmean" placeholder="${L('English, like to return', 'Значение, например вернуться')}" value="${esc(v.m)}" oninput="VS.m=this.value" autocomplete="off">
+    <input type="text" id="vinf" data-sp="1" placeholder="${L('Type the infinitive, like hablar, comer or vivir', 'Инфинитив: hablar, comer, vivir')}" value="${esc(v.inf)}" oninput="vinfInput(this)" onblur="vinfDone(this)" autocapitalize="off" autocomplete="off">${specialsHtml()}
+    <input type="text" id="vmean" placeholder="${L('English, like to return', 'Значение, например вернуться')}" value="${esc(v.m)}" oninput="VS.m=this.value;refreshPreview()" autocomplete="off">
     <div class="chips">${types.map(([k, lb]) => `<button class="${(v.k || '') === k ? 'on' : ''}" onclick="VS.k=${k ? `'${k}'` : 'null'};drawVerbSheet()">${lb}</button>`).join('')}</div>
-    ${it ? `<p class="hintx">${L('Tap a type and the table changes. Tap any form to fix it by hand.', 'Выберите тип — таблица изменится. Нажмите на форму, чтобы исправить.')} ${it.guessed ? `<span class="warn">${L('Type · please check (memo guessed regular)', 'Проверьте тип (memo решил: правильный)')}</span>` : ''}</p>
-    <div class="card"><table>${it.forms.map((x, p) => `<tr onclick="fixForm(${p})" style="cursor:pointer"><td>${PERSONS[p]}</td><td><b class="${v.f[p] ? 'irr' : ''}">${esc(x ?? '')}</b></td></tr>`).join('')}</table></div>` : ''}
+    <div id="vprev">${previewHtml()}</div>
     <div class="card row" onclick="VS.also=!VS.also;drawVerbSheet()"><div><b>${L('Also add to a word list', 'Добавить в список слов')}</b><small>${L('for normal word cards', 'для обычных карточек')}</small></div><span class="switch ${v.also ? 'on' : ''}"></span></div>
     ${v.also ? `<select onchange="VS.list=this.value"><option value="">${L('List', 'Список')}…</option>${D.lists.map(l => `<option value="${l.id}" ${v.list === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}</select>` : ''}
     <div class="acts">${v.i >= 0 ? `<button class="bad" onclick="delVerb()">${L('Delete', 'Удалить')}</button>` : ''}<button class="soft" onclick="closeSheet()">${L('Cancel', 'Отмена')}</button>${v.i < 0 ? `<button class="soft" onclick="saveVerb(true)">${L('Save and add another', 'Ещё')}</button>` : ''}<button class="primary" onclick="saveVerb(false)">${L('Save', 'Сохранить')}</button></div>`);
 }
-function autoMeaning() { const b = BYINF[VS.inf.trim().toLowerCase()]; if (b && !VS.m.trim()) VS.m = lang() === 'ru' ? b.ru : b.en; }
-function fixForm(p) { const it = verbItem(VS.inf, VS.m, VS.k, VS.f); const v = prompt(PERSONS[p], it.forms[p] || ''); if (v === null) return; VS.f[p] = v.trim() === (verbItem(VS.inf, VS.m, VS.k, Array(6).fill('')).forms[p] || '') ? '' : v.trim(); drawVerbSheet(); }
 function saveVerb(again) {
   const inf = VS.inf.trim().toLowerCase(); if (!isInfinitive(inf)) { toast(L('Type a Spanish infinitive', 'Введите инфинитив')); return; }
   if (VS.i < 0 && D.myverbs.some(x => x.i === inf)) return;
@@ -783,7 +818,7 @@ SCREENS.vquiz = (m, b) => {
   m.innerHTML = `<div class="top"><button class="x" onclick="endQuiz()">✕</button><p class="prog">${Q.i + 1} / ${Q.cards.length}</p></div><div class="bar"><i style="width:${Q.i / Q.cards.length * 100}%"></i></div>
     <div class="flash" style="min-height:${c.kind === 'choice' ? 190 : 260}px;height:auto;padding:46px 16px 24px">${art('peek-thinking', 'peek')}<div class="cap">${QCAP[c.kind]()}</div><div>${body}${fb}</div></div>` +
     (c.kind === 'choice' ? `<div class="bar t" style="margin:14px 0"><i id="tbar" style="width:100%"></i></div>` + c.options.map((o, k) => `<button class="optbtn ${answered ? (o === c.ans ? 'right' : (o === Q.chosen ? 'wrong' : '')) : ''}" ${answered ? 'disabled' : ''} onclick="choose(${k})">${esc(o)}</button>`).join('') :
-      (answered ? '' : `<input class="f" id="ans" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">`));
+      (answered ? '' : `<input class="f" id="ans" data-sp="1" placeholder="${L('Type in Spanish', 'По-испански')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">${specialsHtml()}`));
   if (c.kind === 'choice') {
     if (!answered) { setTimeout(() => { const t = $('#tbar'); if (t) { t.style.transition = 'width 8s linear'; t.style.width = '0%'; } }, 30); choiceTimer = setTimeout(() => { if (Q && !Q.done && Q.res == null) choose(null); }, 8000); }
     b.innerHTML = answered ? `<div class="btnbar"><button class="primary" onclick="vnext()">${L('Next', 'Дальше')}</button></div>` : '';
@@ -847,6 +882,12 @@ function restoreBackup() {
   let c; try { c = JSON.parse($('#bkt').value); if (!c.words || !c.lists) throw 0; } catch { toast(L("That text couldn't be restored.", 'Не удалось восстановить.')); return; }
   confirmBox(L('Replace everything?', 'Заменить всё?'), L('Your lists, words and stats will be replaced with this backup', 'Ваши списки, слова и статистика будут заменены'), L('Restore', 'Восстановить'), () => { D = Object.assign(fresh(), c); D.set = Object.assign(fresh().set, D.set); save(); resetTo(null); });
 }
+
+/* =================== KEYBOARD =================== */
+const isField = el => el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && el.type !== 'file';
+document.addEventListener('focusin', e => { if (!isField(e.target)) return; document.body.classList.add('kb'); const t = e.target; [250, 600].forEach(ms => setTimeout(() => { try { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch {} }, ms)); });
+document.addEventListener('focusout', () => setTimeout(() => { if (!isField(document.activeElement)) document.body.classList.remove('kb'); }, 150));
+try { if (tg) tg.onEvent('viewportChanged', () => { const a = document.activeElement; if (isField(a)) setTimeout(() => a.scrollIntoView({ block: 'center' }), 100); }); } catch {}
 
 /* =================== BOOT =================== */
 let EXAMPLES = null;
